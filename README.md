@@ -19,7 +19,7 @@ cd trumpet
 ```
 2. Download the Media (Python)
 The repo does not include the heavy PDFs/Audio. You must download them to your local out/ folder first.
-
+Run inside 'trumpet' directory:
 
 ```bash
 pip install requests
