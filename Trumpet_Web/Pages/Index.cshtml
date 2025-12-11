@@ -1,0 +1,81 @@
+﻿@page
+@using Microsoft.EntityFrameworkCore
+@model IndexModel
+@{
+    ViewData["Title"] = "Corfiot Music Archive";
+}
+
+<div class="text-center mb-4">
+    <h1 class="display-4">Corfiot Music Archive</h1>
+    <p>Found @Model.Items.Count items in the database.</p>
+</div>
+
+<div class="container">
+    @foreach (var item in Model.Items)
+    {
+        <div class="card mb-3">
+            <div class="card-header bg-light">
+                <strong>@item.Name</strong>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        @foreach (var meta in item.Metadata.Where(m => m.Field == "dc.description" || m.Field == "dc.contributor.author").Take(3))
+                        {
+                            <p class="mb-1"><small class="text-muted">@meta.Field:</small> @meta.Value</p>
+                        }
+                    </div>
+                </div>
+
+                @if (item.Bitstreams.Any())
+                {
+                    <h6 class="border-bottom pb-2">Files:</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var file in item.Bitstreams)
+                        {
+                            // FIX: Use System.IO.Path to avoid conflict with the page's Path property
+                            string relativePath = "";
+                            // We look for the "out" folder in the absolute path
+                            int outIndex = file.LocalFilePath.IndexOf("out" + System.IO.Path.DirectorySeparatorChar);
+                            
+                            if (outIndex >= 0)
+                            {
+                                // Extract everything after "out/"
+                                // We add 4 to skip the characters "out" and the slash
+                                relativePath = file.LocalFilePath.Substring(outIndex + 4).Replace("\\", "/");
+                            }
+                            
+                            <a href="/media/@relativePath" target="_blank" class="btn btn-outline-primary btn-sm">
+                                📄 @file.Name
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@functions {
+    public class IndexModel : Microsoft.AspNetCore.Mvc.RazorPages.PageModel
+    {
+        private readonly MusicContext _db;
+        public List<Item> Items { get; set; } = new();
+
+        public IndexModel(MusicContext db)
+        {
+            _db = db;
+        }
+
+        public void OnGet()
+        {
+            Items = _db.Items
+                       .Include(i => i.Metadata)
+                       .Include(i => i.Bitstreams)
+                       .Where(i => i.Bitstreams.Count > 0)
+                       .OrderBy(i => i.Name) // Sort alphabetically
+                       .Take(20)
+                       .ToList();
+        }
+    }
+}
