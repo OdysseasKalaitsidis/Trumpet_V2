@@ -1,0 +1,17 @@
+# Ignore huge data folders
+out/
+
+# Ignore the database files
+*.db
+*.db-shm
+*.db-wal
+
+# Ignore compiled code folders
+**/bin/
+**/obj/
+
+# Ignore Mac system files
+.DS_Store
+
+# Ignore VS Code local settings
+.vscode/
