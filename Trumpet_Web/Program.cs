@@ -22,7 +22,8 @@ app.UseStaticFiles();
 
 // 2. ENABLE ACCESS TO YOUR DOWNLOADED FILES
 // We map the URL "/media" to your physical "out" folder
-string outPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "../out"));
+// It is now located in the sibling project "Trumpet_Net/ImportData/out"
+string outPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "../Trumpet_Net/ImportData/out"));
 
 if (Directory.Exists(outPath))
 {
@@ -30,7 +31,7 @@ if (Directory.Exists(outPath))
     {
         FileProvider = new PhysicalFileProvider(outPath),
         RequestPath = "/media",
-        ServeUnknownFileTypes = true // Allow serving weird file extensions if any
+        ServeUnknownFileTypes = true
     });
     Console.WriteLine($"[WEB] Serving media from: {outPath}");
 }
