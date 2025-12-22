@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Trumpet.Net.Data;
+using Trumpet.Shared;
 using Trumpet.Net.Services;
 
 var builder = WebApplication.CreateBuilder(args);

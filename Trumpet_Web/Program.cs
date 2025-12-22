@@ -1,11 +1,13 @@
 using Microsoft.Extensions.FileProviders;
-using Trumpet.Net.Models;
+using Trumpet.Shared;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddDbContext<MusicContext>(); // Register our database
+builder.Services.AddDbContext<MusicContext>(options => 
+    options.UseSqlite("Data Source=../Trumpet_Net/corfiot_music.db")); // Register our database with correct path
 
 var app = builder.Build();
 

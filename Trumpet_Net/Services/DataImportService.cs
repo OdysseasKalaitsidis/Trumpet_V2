@@ -1,6 +1,5 @@
 using Newtonsoft.Json.Linq;
-using Trumpet.Net.Data;
-using Trumpet.Net.Models;
+using Trumpet.Shared;
 
 namespace Trumpet.Net.Services;
 

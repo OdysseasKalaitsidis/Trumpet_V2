@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Trumpet.Net.Models;
 
-namespace Trumpet.Net.Data;
+namespace Trumpet.Shared;
 
 public class MusicContext : DbContext
 {
@@ -17,7 +16,10 @@ public class MusicContext : DbContext
     {
         if (!options.IsConfigured)
         {
-            options.UseSqlite("Data Source=corfiot_music.db");
+            // Ideally this connection string should come from configuration, 
+            // but preserving the relative path logic for now as per original code.
+            // Note: Relative paths in context of a library might be tricky depending on execution directory.
+            options.UseSqlite("Data Source=corfiot_music.db"); 
         }
     }
 }

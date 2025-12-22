@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Trumpet.Net.Data;
+using Trumpet.Shared;
 using Trumpet.Net.Services;
-using Trumpet.Net.Models;
 
 namespace Trumpet.Net.Controllers;
 

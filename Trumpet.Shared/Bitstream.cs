@@ -1,4 +1,4 @@
-namespace Trumpet.Net.Models;
+namespace Trumpet.Shared;
 
 public class Bitstream
 {

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Trumpet.Net.Models;
+using Trumpet.Shared;
 
 namespace Trumpet_Web.Pages
 {

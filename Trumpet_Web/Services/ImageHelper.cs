@@ -1,7 +1,7 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using System.IO;
-using Trumpet.Net.Models;
+using Trumpet.Shared;
 
 namespace Trumpet_Web.Services
 {

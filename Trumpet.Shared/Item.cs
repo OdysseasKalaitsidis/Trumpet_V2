@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Trumpet.Net.Models;
+namespace Trumpet.Shared;
 
 public class Item
 {
