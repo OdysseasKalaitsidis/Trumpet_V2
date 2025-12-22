@@ -1,0 +1,291 @@
+@page "{id}"
+@using Microsoft.EntityFrameworkCore
+@model Trumpet_Web.Pages.ItemModel
+@{
+    ViewData["Title"] = Model.Item.Name;
+}
+
+<div class="container mt-4">
+    <div class="mb-3">
+        <a href="/" class="btn btn-outline-secondary">&larr; Back to Archive</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            @if (Model.CoverImage != null)
+            {
+                // Logic to extract relative path (duplicated from Index, refactor later ideally)
+                string relativePath = "";
+                int outIndex = Model.CoverImage.LocalFilePath.IndexOf("out" + System.IO.Path.DirectorySeparatorChar);
+                if (outIndex >= 0)
+                {
+                    relativePath = Model.CoverImage.LocalFilePath.Substring(outIndex + 4).Replace("\\", "/");
+                }
+
+                <img src="/media/@relativePath" class="img-fluid rounded shadow" alt="@Model.Item.Name">
+            }
+            else
+            {
+                <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded shadow" style="height: 300px;">
+                    @* Check for PDF fallback *@
+                    @{
+                         var pdfBitstream = Model.Item.Bitstreams.FirstOrDefault(b => b.MimeType == "application/pdf" || b.Name.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase));
+                         if (pdfBitstream != null)
+                         {
+                             string pdfUrl = "";
+                             int outIndex = pdfBitstream.LocalFilePath.IndexOf("out" + System.IO.Path.DirectorySeparatorChar);
+                             if (outIndex >= 0)
+                             {
+                                 pdfUrl = "/media/" + pdfBitstream.LocalFilePath.Substring(outIndex + 4).Replace("\\", "/");
+                             }
+                             <canvas class="pdf-thumb img-fluid rounded shadow" data-url="@pdfUrl" style="width: 100%; object-fit: contain;"></canvas>
+                         }
+                         else
+                         {
+                             <span>No Cover Image</span>
+                         }
+                    }
+                </div>
+            }
+        </div>
+        <div class="col-md-8">
+            <h1 class="display-5">@Model.Item.Name</h1>
+            <hr />
+            
+            <div class="row">
+                @foreach (var meta in Model.Item.Metadata.Where(m => m.Field == "dc.contributor.author" || (m.Field == "dc.description" && (m.Language == "en" || m.Language == "en_US"))))
+                {
+                   string label = meta.Field == "dc.contributor.author" ? "Creator" : "Description";
+                   <div class="col-sm-3 fw-bold">@label</div>
+                   <div class="col-sm-9 mb-3">@meta.Value</div>
+                }
+            </div>
+
+            <h3 class="mt-4"></h3>
+            <div class="mb-4">
+            <h3 class="mt-4">Media</h3>
+            <div class="mb-4">
+                 @{
+                     // Priority: Check for Audio first
+                     var audioExtensions = new[] { ".mp3", ".wav", ".ogg", ".m4a" };
+                     var audioFiles = Model.Item.Bitstreams
+                        .Where(file => (file.MimeType != null && file.MimeType.StartsWith("audio/")) || 
+                                       (file.Name != null && audioExtensions.Any(ext => file.Name.EndsWith(ext, StringComparison.OrdinalIgnoreCase))))
+                        .ToList();
+
+                     if (audioFiles.Any())
+                     {
+                         foreach (var file in audioFiles)
+                         {
+                             string relativePath = "";
+                             int outIndex = file.LocalFilePath.IndexOf("out" + System.IO.Path.DirectorySeparatorChar);
+                             if (outIndex >= 0)
+                             {
+                                 relativePath = file.LocalFilePath.Substring(outIndex + 4).Replace("\\", "/");
+                             }
+                             
+                             <div class="card mb-2">
+                                 <div class="card-body">
+                                     <h6 class="card-title">@file.Name</h6>
+                                     <audio controls class="w-100">
+                                         <source src="/media/@relativePath" type="audio/mpeg">
+                                         Your browser does not support the audio element.
+                                     </audio>
+                                 </div>
+                             </div>
+                         }
+                     }
+                     else
+                     {
+                         // Fallback: Check for Video
+                         var videoExtensions = new[] { ".mp4", ".m4v", ".mov", ".webm" };
+                         var videoFiles = Model.Item.Bitstreams
+                            .Where(file => (file.MimeType != null && file.MimeType.StartsWith("video/")) || 
+                                           (file.Name != null && videoExtensions.Any(ext => file.Name.EndsWith(ext, StringComparison.OrdinalIgnoreCase))))
+                            .ToList();
+                            
+                         foreach (var file in videoFiles)
+                         {
+                             string relativePath = "";
+                             int outIndex = file.LocalFilePath.IndexOf("out" + System.IO.Path.DirectorySeparatorChar);
+                             if (outIndex >= 0)
+                             {
+                                 relativePath = file.LocalFilePath.Substring(outIndex + 4).Replace("\\", "/");
+                             }
+                             
+                             <div class="card mb-2">
+                                 <div class="card-body">
+                                     <h6 class="card-title">@file.Name</h6>
+                                     <div class="ratio ratio-16x9">
+                                         <video controls>
+                                             <source src="/media/@relativePath" type="video/mp4">
+                                             Your browser does not support the video tag.
+                                         </video>
+                                     </div>
+                                 </div>
+                             </div>
+                         }
+                     }
+                 }
+            </div>
+            </div>
+
+            <h3 class="mt-4">All Files</h3>
+            <div class="list-group">
+                @foreach (var file in Model.Item.Bitstreams)
+                {
+                     string relativePath = "";
+                     int outIndex = file.LocalFilePath.IndexOf("out" + System.IO.Path.DirectorySeparatorChar);
+                     if (outIndex >= 0)
+                     {
+                         relativePath = file.LocalFilePath.Substring(outIndex + 4).Replace("\\", "/");
+                     }
+                     string fullUrl = $"/media/{relativePath}";
+                     
+                     // Determine simple type for JS
+                     string jsType = "generic";
+                     if (file.MimeType?.StartsWith("video/") == true || file.Name.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase)) jsType = "video";
+                     else if (file.MimeType?.StartsWith("audio/") == true || file.Name.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase)) jsType = "audio";
+                     else if (file.MimeType?.StartsWith("image/") == true || file.Name.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) || file.Name.EndsWith(".png", StringComparison.OrdinalIgnoreCase)) jsType = "image";
+                     else if (file.MimeType == "application/pdf" || file.Name.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)) jsType = "pdf";
+
+                     <a href="javascript:void(0)" onclick="openFileModal('@fullUrl', '@file.Name', '@jsType')" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>@file.Name</strong>
+                            <div class="small text-muted">@file.MimeType</div>
+                        </div>
+                        <span class="badge bg-secondary rounded-pill">View</span>
+                     </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- File Viewer Modal -->
+<div class="modal fade" id="fileViewerModal" tabindex="-1" aria-labelledby="fileViewerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="fileViewerModalLabel">File Viewer</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0" id="fileViewerBody">
+        <!-- Content will be injected here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        // existing modal script...
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            var canvases = document.querySelectorAll('canvas.pdf-thumb');
+            
+            canvases.forEach(function(canvas) {
+                var url = canvas.getAttribute('data-url');
+                var loadingTask = pdfjsLib.getDocument(url);
+                
+                loadingTask.promise.then(function(pdf) {
+                    return pdf.getPage(1);
+                }).then(function(page) {
+                    var viewport = page.getViewport({ scale: 1.0 });
+                    var scale = canvas.parentElement.clientWidth / viewport.width; // Fit to container
+                    if (scale <= 0) scale = 1; // Safety
+                    
+                    var scaledViewport = page.getViewport({ scale: scale });
+
+                    canvas.height = scaledViewport.height;
+                    canvas.width = scaledViewport.width;
+
+                    var renderContext = {
+                        canvasContext: canvas.getContext('2d'),
+                        viewport: scaledViewport
+                    };
+                    
+                    page.render(renderContext);
+                }).catch(function(error) {
+                    console.error('Error rendering PDF thumb:', error);
+                });
+            });
+        });
+
+        function openFileModal(url, title, type) {
+            var modalTitle = document.getElementById('fileViewerModalLabel');
+            var modalBody = document.getElementById('fileViewerBody');
+            
+            modalTitle.textContent = title;
+            modalBody.innerHTML = ''; // Clear previous content
+
+            var contentElement = null;
+
+            if (type === 'video') {
+                contentElement = document.createElement('video');
+                contentElement.controls = true;
+                contentElement.autoplay = true;
+                contentElement.style.width = '100%';
+                contentElement.style.maxHeight = '80vh';
+                contentElement.style.backgroundColor = 'black';
+                
+                var source = document.createElement('source');
+                source.src = url;
+                // Try to guess mime, but browser is usually smart enough or falls back
+                contentElement.appendChild(source);
+            } 
+            else if (type === 'audio') {
+                // Audio player container
+                var container = document.createElement('div');
+                container.className = 'd-flex justify-content-center align-items-center p-5 bg-dark';
+                container.style.height = '300px';
+
+                contentElement = document.createElement('audio');
+                contentElement.controls = true;
+                contentElement.autoplay = true;
+                contentElement.style.width = '100%';
+                contentElement.src = url;
+                
+                container.appendChild(contentElement);
+                contentElement = container; // Attach container
+            }
+            else if (type === 'image') {
+                var container = document.createElement('div');
+                container.className = 'text-center bg-dark';
+                container.style.overflow = 'auto';
+                container.style.maxHeight = '80vh';
+
+                var img = document.createElement('img');
+                img.src = url;
+                img.className = 'img-fluid';
+                img.style.maxHeight = '80vh';
+                
+                container.appendChild(img);
+                contentElement = container;
+            }
+            else {
+                // Generic (PDF, Text, or fallback) -> Iframe
+                contentElement = document.createElement('iframe');
+                contentElement.src = url;
+                contentElement.style.width = '100%';
+                contentElement.style.height = '80vh';
+                contentElement.style.border = 'none';
+            }
+
+            if (contentElement) {
+                modalBody.appendChild(contentElement);
+            }
+
+            var myModal = new bootstrap.Modal(document.getElementById('fileViewerModal'));
+            myModal.show();
+            
+            // Cleanup on close to stop playback
+            document.getElementById('fileViewerModal').addEventListener('hidden.bs.modal', function () {
+                modalBody.innerHTML = '';
+            });
+        }
+    </script>
+}

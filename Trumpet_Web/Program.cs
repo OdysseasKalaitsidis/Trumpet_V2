@@ -1,4 +1,5 @@
 using Microsoft.Extensions.FileProviders;
+using Trumpet.Net.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +24,7 @@ app.UseStaticFiles();
 // 2. ENABLE ACCESS TO YOUR DOWNLOADED FILES
 // We map the URL "/media" to your physical "out" folder
 // It is now located in the sibling project "Trumpet_Net/ImportData/out"
-string outPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "../Trumpet_Net/ImportData/out"));
+string outPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, "../out"));
 
 if (Directory.Exists(outPath))
 {

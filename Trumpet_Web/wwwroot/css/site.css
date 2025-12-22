@@ -1,22 +1,178 @@
-html {
-  font-size: 14px;
+html,
+body {
+  height: 100%;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+:root {
+  --liquid-bg: #202020;
+  --liquid-card-bg: rgba(255, 255, 255, 0.8);
+  --liquid-primary: #4a90e2;
+  --liquid-accent: #6c5ce7;
+  --liquid-radius: 20px;
+  --liquid-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  --liquid-transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 body {
-  margin-bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--liquid-bg);
+  background-image: radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+  background-attachment: fixed;
+  background-size: cover;
+  color: #f0f0f0;
+  font-family: 'Outfit', sans-serif;
+}
+
+.main-container {
+  flex: 1;
+}
+
+.container {
+  max-width: 1200px;
+}
+
+/* Navbar */
+.navbar {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 0 0 var(--liquid-radius) var(--liquid-radius);
+  margin-bottom: 2rem !important;
+}
+
+.navbar-brand,
+.nav-link {
+  color: #fff !important;
+  font-weight: 500;
+}
+
+/* Cards */
+.card {
+  background: var(--liquid-card-bg);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: var(--liquid-radius) !important;
+  transition: var(--liquid-transition);
+  color: #fff !important;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.item-card {
+  overflow: hidden;
+}
+
+.item-card img,
+.item-card canvas {
+  border-radius: var(--liquid-radius) var(--liquid-radius) 0 0;
+  transition: transform 0.6s ease;
+}
+
+.item-card:hover img {
+  transform: scale(1.05);
+}
+
+/* Buttons */
+.btn {
+  border-radius: 12px !important;
+  padding: 0.6rem 1.5rem;
+  font-weight: 500;
+  transition: var(--liquid-transition);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--liquid-primary), var(--liquid-accent));
+  border: none;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: scale(1.03);
+}
+
+/* Details Page Refinements */
+.img-fluid.rounded.shadow {
+  border-radius: var(--liquid-radius) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.list-group-item {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #ccc !important;
+  margin-bottom: 0.5rem;
+  border-radius: 12px !important;
+  transition: var(--liquid-transition);
+}
+
+.list-group-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+.fw-bold {
+  color: var(--liquid-primary);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-weight: 700;
+}
+
+.display-4 {
+  background: linear-gradient(to right, #fff, #a29bfe);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.badge {
+  border-radius: 8px !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Path Icons */
+.path-icon {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 70%, transparent 100%);
+  border-radius: 50%;
+  padding: 15px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: var(--liquid-transition);
+}
+
+.path-icon:hover {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 70%, transparent 100%);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
 }
