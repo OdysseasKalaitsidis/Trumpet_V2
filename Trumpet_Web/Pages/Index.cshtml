@@ -79,8 +79,8 @@
                    imageUrl = "/media/" + coverImage.LocalFilePath.Substring(outIndex + 4).Replace("\\", "/");
                }
             }
-
-            // Fallback: If no good image, check for PDF
+                
+            //  Fallback: If no good image, check for PDF
             string pdfUrl = "";
             if (string.IsNullOrEmpty(imageUrl))
             {
