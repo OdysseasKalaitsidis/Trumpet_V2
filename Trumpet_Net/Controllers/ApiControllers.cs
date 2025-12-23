@@ -1,11 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Trumpet.Shared;
+using Trumpet.Net.Models;
+using Trumpet.Net.Data;
 using Trumpet.Net.Services;
+
+using Microsoft.AspNetCore.Cors;
 
 namespace Trumpet.Net.Controllers;
 
 [ApiController]
+[EnableCors("AllowAll")]
 [Route("api/[controller]")]
 public class ItemsController : ControllerBase
 {
@@ -17,9 +21,40 @@ public class ItemsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Item>>> GetItems([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<Item>>> GetItems([FromQuery] string? path, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        return await _context.Items
+        IQueryable<Item> query = _context.Items
+            .Include(i => i.Metadata)
+            .Include(i => i.Bitstreams)
+            .Where(i => i.Bitstreams.Count > 0);
+
+        if (!string.IsNullOrEmpty(path))
+        {
+            var searchValues = new List<string>();
+            switch (path)
+            {
+                case "ArtMusic":
+                    searchValues.AddRange(new[] { "Art music", "Μουσική του Άστεως", "Μουσική του άστεως" });
+                    break;
+                case "UrbanPopular":
+                    searchValues.AddRange(new[] { "Urban popular music", "Αστικολαϊκή μουσική" });
+                    break;
+                case "RuralMusic":
+                    searchValues.AddRange(new[] { "Rural music", "Μουσική της υπαίθρου" });
+                    break;
+                case "SacredMusic":
+                    searchValues.AddRange(new[] { "Sacred music", "Εκκλησιαστική μουσική" });
+                    break;
+            }
+
+            if (searchValues.Any())
+            {
+                query = query.Where(i => i.Metadata.Any(m => m.Field == "dc.musicsubpath" && searchValues.Contains(m.Value)));
+            }
+        }
+
+        return await query
+            .OrderBy(i => i.Name)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();

@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Trumpet.Shared;
+﻿using Microsoft.Extensions.FileProviders;
+using Microsoft.EntityFrameworkCore;
+using Trumpet.Net.Data;
 using Trumpet.Net.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
 
 // Database
 builder.Services.AddDbContext<MusicContext>(options =>
@@ -18,11 +30,35 @@ builder.Services.AddScoped<IDataImportService, DataImportService>();
 
 var app = builder.Build();
 
+app.UseCors("AllowAll");
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+// Serve media files
+var outPath = Path.Combine(builder.Environment.ContentRootPath, "../out"); // Assuming 'out' is sibling to Trumpet_Net folder
+if (!Directory.Exists(outPath))
+{
+    // Fallback or try to find it relative to current dir if running differently
+    outPath = Path.Combine(Directory.GetCurrentDirectory(), "out");
+}
+
+if (Directory.Exists(outPath))
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(outPath),
+        RequestPath = "/media",
+        OnPrepareResponse = ctx =>
+        {
+            ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+            ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers", "*");
+        }
+    });
 }
 
 app.UseAuthorization();
