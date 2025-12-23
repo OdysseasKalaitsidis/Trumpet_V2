@@ -1,32 +1,33 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import HomePage from './HomePage';
 import ItemDetail from './ItemDetail';
+import SearchBox from './components/SearchBox';
 
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="d-flex flex-column min-vh-100">
+      <div className="flex flex-col min-h-screen">
         <header>
-          <nav className="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div className="container">
-              <Link className="navbar-brand" to="/">Trumpet_UI</Link>
-              <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                aria-expanded="false" aria-label="Toggle navigation">
-                <span className="navbar-toggler-icon"></span>
-              </button>
-              <div className="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul className="navbar-nav flex-grow-1">
-                  <li className="nav-item">
-                    <Link className="nav-link text-dark" to="/">Home</Link>
+          <nav className="navbar-glass px-4 py-3">
+            <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between">
+              <Link className="text-2xl font-bold text-white no-underline mr-8" to="/">Trumpet_UI</Link>
+
+              <div className="flex-grow flex items-center justify-between">
+                <ul className="flex space-x-4 list-none m-0 p-0">
+                  <li>
+                    <Link className="text-white hover:text-white/80 transition-colors no-underline font-medium" to="/">Home</Link>
                   </li>
                 </ul>
+                <div className="ml-4">
+                  <SearchBox />
+                </div>
               </div>
             </div>
           </nav>
         </header>
 
-        <div className="container main-container">
-          <main role="main" className="pb-3">
+        <div className="flex-1 w-full max-w-7xl mx-auto px-4 pb-8">
+          <main role="main">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/item/:id" element={<ItemDetail />} />
@@ -34,8 +35,8 @@ export default function App() {
           </main>
         </div>
 
-        <footer className="border-top footer text-muted mt-auto">
-          <div className="container">
+        <footer className="border-t border-white/10 mt-auto py-4 text-white/50 text-sm">
+          <div className="max-w-7xl mx-auto px-4 text-center">
             &copy; 2025 - Trumpet_UI
           </div>
         </footer>

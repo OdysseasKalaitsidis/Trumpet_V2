@@ -21,7 +21,7 @@ public class ItemsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Item>>> GetItems([FromQuery] string? path, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<IEnumerable<Item>>> GetItems([FromQuery] string? path, [FromQuery] string? search, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         IQueryable<Item> query = _context.Items
             .Include(i => i.Metadata)
@@ -51,6 +51,11 @@ public class ItemsController : ControllerBase
             {
                 query = query.Where(i => i.Metadata.Any(m => m.Field == "dc.musicsubpath" && searchValues.Contains(m.Value)));
             }
+        }
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(i => i.Name.Contains(search) || i.Metadata.Any(m => m.Value.Contains(search)));
         }
 
         return await query

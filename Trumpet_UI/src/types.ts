@@ -11,6 +11,7 @@ export interface Bitstream {
     itemId: string;
     name: string;
     mimeType?: string;
+    sizeBytes: number;
     localFilePath: string;
 }
 

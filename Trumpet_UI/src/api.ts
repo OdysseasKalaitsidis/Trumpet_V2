@@ -2,10 +2,13 @@ import type { Item } from './types';
 
 export const API_BASE_URL = 'http://localhost:5268';
 
-export async function fetchItems(path?: string, page: number = 1, pageSize: number = 1000): Promise<Item[]> {
+export async function fetchItems(path?: string, search?: string, page: number = 1, pageSize: number = 1000): Promise<Item[]> {
     let url = `${API_BASE_URL}/api/items?page=${page}&pageSize=${pageSize}`;
     if (path) {
         url += `&path=${path}`;
+    }
+    if (search) {
+        url += `&search=${encodeURIComponent(search)}`;
     }
 
     const response = await fetch(url);

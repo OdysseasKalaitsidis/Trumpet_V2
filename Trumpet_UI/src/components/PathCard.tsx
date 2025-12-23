@@ -9,14 +9,12 @@ interface PathCardProps {
 
 export default function PathCard({ title, subtitle, imgSrc, pathFilter }: PathCardProps) {
     return (
-        <div className="col-md-3 col-sm-6 mb-3">
-            <div className="card h-100 shadow-sm text-center">
-                <div className="card-body d-flex flex-column justify-content-center align-items-center">
-                    <img src={imgSrc} alt={`${title} icon`} className="img-fluid mb-3 path-icon" style={{ maxHeight: '130px', objectFit: 'contain' }} />
-                    <h5>{title}</h5>
-                    <p className="text-muted small">({subtitle})</p>
-                    <Link to={`/?path=${pathFilter}`} className="btn btn-primary mt-2">Explore</Link>
-                </div>
+        <div className="col-span-1">
+            <div className="card-glass h-full text-center p-6 flex flex-col items-center justify-center group hover:bg-white/15">
+                <img src={imgSrc} alt={`${title} icon`} className="w-auto h-[130px] object-contain mb-6 path-icon" />
+                <h5 className="font-bold text-xl mb-2">{title}</h5>
+                <p className="text-white/60 text-sm mb-4">({subtitle})</p>
+                <Link to={`/?path=${pathFilter}`} className="btn-liquid btn-liquid-primary mt-auto inline-block no-underline">Explore</Link>
             </div>
         </div>
     );

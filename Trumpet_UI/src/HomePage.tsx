@@ -7,6 +7,7 @@ import PathCard from './components/PathCard';
 export default function HomePage() {
     const [searchParams] = useSearchParams();
     const pathFilter = searchParams.get('path') || '';
+    const searchQuery = searchParams.get('search') || '';
     const [items, setItems] = useState<Item[]>([]);
     const [loading, setLoading] = useState(false);
     const [pathTitle, setPathTitle] = useState('All Archives');
@@ -15,16 +16,22 @@ export default function HomePage() {
         const load = async () => {
             setLoading(true);
             try {
-                const data = await fetchItems(pathFilter);
+                const data = await fetchItems(pathFilter, searchQuery);
                 setItems(data);
 
                 // Set title
+                let title = 'All Archives';
                 switch (pathFilter) {
-                    case 'ArtMusic': setPathTitle('Η μουσική του άστεως (Art Music)'); break;
-                    case 'UrbanPopular': setPathTitle('Η αστικολαϊκή μουσική (Urban Popular Music)'); break;
-                    case 'RuralMusic': setPathTitle('Η μουσική της υπαίθρου (Rural Music)'); break;
-                    case 'SacredMusic': setPathTitle('Η εκκλησιαστική μουσική (Sacred Music)'); break;
-                    default: setPathTitle('All Archives');
+                    case 'ArtMusic': title = 'Η μουσική του άστεως (Art Music)'; break;
+                    case 'UrbanPopular': title = 'Η αστικολαϊκή μουσική (Urban Popular Music)'; break;
+                    case 'RuralMusic': title = 'Η μουσική της υπαίθρου (Rural Music)'; break;
+                    case 'SacredMusic': title = 'Η εκκλησιαστική μουσική (Sacred Music)'; break;
+                }
+
+                if (searchQuery) {
+                    setPathTitle(`${title} - Search: ${searchQuery}`);
+                } else {
+                    setPathTitle(title);
                 }
             } catch (err) {
                 console.error(err);
@@ -33,19 +40,20 @@ export default function HomePage() {
             }
         };
         load();
-    }, [pathFilter]);
+    }, [pathFilter, searchQuery]);
 
     const getCoverUrl = (item: Item) => {
-        // Same logic as Index.cshtml
-        // 1. Check for Image bitstream (usually first one or by assumption)
-        // In Razor: ImageHelper.GetBestCoverImage(item)
-        // We'll mimic strict logic: find bitstream with mime starting 'image/' or name ending .jpg/png
-
-        // Let's use name extension or mimetype if available
-        const image = item.bitstreams.find(b =>
+        // Find all image bitstreams
+        const imageBitstreams = item.bitstreams.filter(b =>
             (b.mimeType && b.mimeType.startsWith('image/')) ||
             b.name.match(/\.(jpg|jpeg|png|gif)$/i)
         );
+
+        // Sort by size (descending) to get the largest/clearest image
+        imageBitstreams.sort((a, b) => (b.sizeBytes || 0) - (a.sizeBytes || 0));
+
+        // Start with the largest image
+        const image = imageBitstreams.length > 0 ? imageBitstreams[0] : null;
 
         if (image) return getMediaUrl(image.localFilePath);
 
@@ -62,47 +70,47 @@ export default function HomePage() {
 
     return (
         <>
-            <div className="text-center mb-5">
-                <h1 className="display-4">Corfiot Music Archive</h1>
-                <p className="lead">Select a Music Path to explore the archive.</p>
+            <div className="text-center mb-12">
+                <h1 className="display-title text-5xl mb-4">Corfiot Music Archive</h1>
+                <p className="text-xl text-white/75">Select a Music Path to explore the archive.</p>
             </div>
 
             {/* Music Paths Navigation */}
-            <div className="row mb-5 justify-content-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
                 <PathCard title="Art Music" subtitle="Η μουσική του άστεως" imgSrc="/img/art_music.png" pathFilter="ArtMusic" />
                 <PathCard title="Urban Popular Music" subtitle="Η αστικολαϊκή μουσική" imgSrc="/img/urban_popular.png" pathFilter="UrbanPopular" />
                 <PathCard title="Rural Music" subtitle="Η μουσική της υπαίθρου" imgSrc="/img/rural_music.png" pathFilter="RuralMusic" />
                 <PathCard title="Sacred Music" subtitle="Η εκκλησιαστική μουσική" imgSrc="/img/sacred_music.png" pathFilter="SacredMusic" />
             </div>
 
-            <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                <h2>{pathTitle}</h2>
-                {pathFilter && <Link to="/" className="btn btn-outline-secondary">Show All Archives</Link>}
+            <div className="flex flex-wrap items-center justify-between mb-8 border-b border-white/10 pb-4">
+                <h2 className="text-3xl font-bold">{pathTitle}</h2>
+                {pathFilter && <Link to="/" className="btn-liquid border border-white/20 hover:bg-white/10 text-white no-underline text-sm">Show All Archives</Link>}
             </div>
 
-            <p className="text-muted mb-4">Found {items.length} items in this path.</p>
+            <p className="text-white/60 mb-8">Found {items.length} items in this path.</p>
 
-            <div className="container">
-                <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                    {loading ? <p>Loading...</p> : items.map(item => {
+            <div className="container p-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {loading ? <p className="col-span-full text-center text-white/50">Loading...</p> : items.map(item => {
                         const coverUrl = getCoverUrl(item);
                         return (
-                            <div className="col" key={item.id}>
-                                <Link to={`/item/${item.id}`} className="text-decoration-none text-dark">
-                                    <div className="card h-100 shadow-sm border-0 item-card">
+                            <div className="col-span-1" key={item.id}>
+                                <Link to={`/item/${item.id}`} className="text-decoration-none text-white block h-full">
+                                    <div className="card-glass h-full item-card flex flex-col">
                                         {coverUrl ? (
                                             <>
-                                                <img src={coverUrl} className="card-img-top" alt={item.name} style={{ height: '250px', objectFit: 'cover' }} onError={(e) => { e.currentTarget.style.display = 'none'; console.error('Image load failed:', coverUrl); }} />
-                                                <small className="d-none">{coverUrl}</small>
+                                                <img src={coverUrl} className="w-full h-64 object-cover" alt={item.name} onError={(e) => { e.currentTarget.style.display = 'none'; console.error('Image load failed:', coverUrl); }} />
+                                                <small className="hidden">{coverUrl}</small>
                                             </>
                                         ) : (
-                                            <div className="card-img-top bg-light d-flex align-items-center justify-content-center" style={{ height: '250px' }}>
-                                                <span className="text-muted fs-1">🎵</span>
+                                            <div className="w-full h-64 bg-white/5 flex items-center justify-center">
+                                                <span className="text-white/20 text-6xl">🎵</span>
                                             </div>
                                         )}
-                                        <div className="card-body">
-                                            <h6 className="card-title text-truncate" title={item.name}>{item.name}</h6>
-                                            <p className="card-text small text-muted text-truncate">
+                                        <div className="p-4 flex-1">
+                                            <h6 className="font-bold text-lg mb-1 truncate" title={item.name}>{item.name}</h6>
+                                            <p className="text-sm text-white/60 truncate">
                                                 {item.metadata.find(m => m.field === 'dc.contributor.author')?.value || ''}
                                             </p>
                                         </div>
