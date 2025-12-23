@@ -3,6 +3,15 @@ body {
   height: 100%;
 }
 
+/* Global Overrides */
+.text-muted {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.text-secondary {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
 :root {
   --liquid-bg: #202020;
   --liquid-card-bg: rgba(255, 255, 255, 0.8);

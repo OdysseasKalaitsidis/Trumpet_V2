@@ -73,27 +73,7 @@ export default function ItemDetail() {
                         )}
 
                         {/* Media Player */}
-                        <div className="card-body border-top">
-                            <h5 className="card-title">Media Player</h5>
-                            {mainMedia ? (
-                                <div className="mt-3">
-                                    <p className="small text-muted mb-1">Now Playing: {mainMedia.name}</p>
-                                    {mainMediaType === 'audio' ? (
-                                        <audio controls className="w-100">
-                                            <source src={getMediaUrl(mainMedia.localFilePath)} type={mainMedia.mimeType || 'audio/mpeg'} />
-                                            Your browser does not support the audio element.
-                                        </audio>
-                                    ) : (
-                                        <video controls className="w-100" style={{ maxHeight: '200px' }}>
-                                            <source src={getMediaUrl(mainMedia.localFilePath)} type={mainMedia.mimeType || 'video/mp4'} />
-                                            Your browser does not support the video element.
-                                        </video>
-                                    )}
-                                </div>
-                            ) : (
-                                <p className="text-muted">No audio/video preview available.</p>
-                            )}
-                        </div>
+
                     </div>
                 </div>
 
@@ -116,6 +96,35 @@ export default function ItemDetail() {
                         <dt className="col-sm-3">Music Path</dt>
                         <dd className="col-sm-9">{getMetadata('dc.musicsubpath') || '-'}</dd>
                     </dl>
+
+                    {/* Modern Media Player Section */}
+                    {mainMedia && (
+                        <div className="card mt-4 mb-4 shadow-sm" style={{ backdropFilter: 'blur(15px)', backgroundColor: 'rgba(255,255,255,0.08)' }}>
+                            <div className="card-body">
+                                <div className="d-flex align-items-center mb-3">
+                                    <span className="fs-4 me-2">▶️</span>
+                                    <div>
+                                        <h5 className="card-title mb-0">Now Playing</h5>
+                                        <small className="text-muted">{mainMedia.name}</small>
+                                    </div>
+                                </div>
+
+                                {mainMediaType === 'audio' ? (
+                                    <audio controls className="w-100" style={{ height: '40px', colorScheme: 'dark' }}>
+                                        <source src={getMediaUrl(mainMedia.localFilePath)} type={(mainMedia.mimeType && mainMedia.mimeType !== 'Unknown') ? mainMedia.mimeType : 'audio/mpeg'} />
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                ) : (
+                                    <div className="ratio ratio-16x9 rounded overflow-hidden">
+                                        <video controls className="w-100">
+                                            <source src={getMediaUrl(mainMedia.localFilePath)} type={(mainMedia.mimeType && mainMedia.mimeType !== 'Unknown') ? mainMedia.mimeType : 'video/mp4'} />
+                                            Your browser does not support the video element.
+                                        </video>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
                     <h4 className="mt-4">Files</h4>
                     <div className="list-group">

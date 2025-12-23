@@ -45,7 +45,8 @@ export function getMediaUrl(filePath: string): string {
         const part = filePath.substring(idx + 3); // skips 'out'
         // remove leading separator if present
         const cleanPart = part.replace(/^[/\\]/, '').replace(/\\/g, '/');
-        return `${API_BASE_URL}/media/${cleanPart}`;
+        const encodedPart = cleanPart.split('/').map(encodeURIComponent).join('/');
+        return `${API_BASE_URL}/media/${encodedPart}`;
     }
     return '';
 }
