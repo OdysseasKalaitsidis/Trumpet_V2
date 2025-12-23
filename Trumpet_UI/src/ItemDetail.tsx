@@ -26,6 +26,15 @@ export default function ItemDetail() {
         return item.metadata.filter(m => m.field === field).map(m => m.value).join(', ');
     };
 
+    // Helper to get multiple fields
+    const getContributors = () => {
+        const fields = ['dc.contributor.author', 'dc.creator', 'dc.contributor.other'];
+        return item.metadata
+            .filter(m => fields.includes(m.field))
+            .map(m => m.value)
+            .join('; ');
+    };
+
     // Cover Image Logic
     const imageBitstream = item.bitstreams.find(b =>
         (b.mimeType && b.mimeType.startsWith('image/')) ||
@@ -85,7 +94,7 @@ export default function ItemDetail() {
                     <h4>Metadata</h4>
                     <dl className="row">
                         <dt className="col-sm-3">Contributors</dt>
-                        <dd className="col-sm-9">{getMetadata('dc.contributor.author') || '-'}</dd>
+                        <dd className="col-sm-9">{getContributors() || '-'}</dd>
 
                         <dt className="col-sm-3">Date</dt>
                         <dd className="col-sm-9">{getMetadata('dc.date.issued') || '-'}</dd>
