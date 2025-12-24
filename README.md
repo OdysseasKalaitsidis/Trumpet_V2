@@ -1,52 +1,80 @@
-## 🚀 Vision
-A cool, satisfying, and simple "Apple-style" web application. The experience is designed as an "unfolding story": as users click, the archive reveals itself through levels of depth, from broad music paths to specific communities and items.
+# Trumpet: Migration & Setup Guide
 
-## 🎨 Visual Identity
-- **Apple Style**: Clean typography (Inter/SF Pro), plenty of white space (or sophisticated dark mode), subtle shadows, and premium glassmorphism.
-- **Interactivity**: Smooth carousels for the initial path selection and fluid transitions between levels.
-- **Micro-animations**: Satisfying feedback loops without overloading the user.
+This guide explains how to set up the **Trumpet** project, specifically for existing data archives moving from the legacy `out` folder structure to the new system.
 
-## 🎯 Strategic Goals
-1. **Path-first Entry**: Users land on 4 distinct "Music Paths":
-   - **Art Music** (Η μουσική του άστεως)
-   - **Urban Popular Music** (Η αστικολαϊκή μουσική)
-   - **Rural Music** (Η μουσική της υπαίθρου)
-   - **Sacred Music** (Η εκκλησιαστική μουσική)
-2. **Community Discovery**: Once inside a path, users discover and categorize data based on communities.
-3. **The "Unfolding" Story**: A level-based navigation that reveals metadata and bitstreams in a satisfying, simple way.
+## 📂 Project Structure
 
----
+To ensure the backend can correctly import and serve your data, you must organize your files as follows within the root `trumpet_data` directory:
 
-## 🛠 Technical Strategy
+```
+trumpet_data/
+├── data/
+│   └── raw/                     <-- Place your JSON metadata files here
+│       ├── communities_*.json
+│       ├── collections_*.json
+│       └── hierarchy_*.json     <-- Critical for Community->Collection links!
+├── resources/                   <-- Rename your 'out' folder to 'resources'
+│   └── [uuid]/                  <-- Item folders containing item_expanded.json
+├── Trumpet.Backend/
+└── Trumpet.Frontend/
+```
 
-### Phase 1: The Backbone (Backend)
-- **Hierarchical API**: Expose communities and their sub-collections via a new `/api/communities` endpoint.
-- **Relational Filtering**: Extend `ItemsController` to allow fetching all items within a specific community (spanning multiple collections).
+### 1. Metadata Files (`data/raw`)
+Place the following JSON export files into `data/raw`:
+*   `communities_20251022_132429.json` (or similar timestamp)
+*   `collections_20251022_132519.json`
+*   `hierarchy_20251021_204338.json` (Required to link orphaned collections to communities)
 
-### Phase 2: The Experience (Frontend)
-- **Community Landing Page**: A "Wow" entrance with cards or interactive elements representing the different music communities.
-- **Fluid Browser**: A seamless transition into the collections and items of a selected community.
-- **Deep Metadata View**: A dedicated component to render every piece of metadata we have, including audio/video players.
-
----
-
-## 📋 Task List & Roles
-
-### 👨‍💻 Ody (Backend & Data)
-- [ ] **Hierarchical API**: Expose Communities and Collections in a way that supports "unfolding" levels.
-- [ ] **Path Filtering**: Implement logic to group communities by the 4 primary Music Paths.
-- [ ] **Metadata Engine**: Ensure all metadata fields are correctly retrieved for the detail view.
-
-### 👨‍🎨 Giannis (Frontend & UX)
-- [ ] **Home Carousel**: Build the high-impact "Apple-style" carousel for the 4 Music Paths.
-- [ ] **Unfolding Navigation**: Implement the level-based routing/animation (Path -> Community -> Collection -> Item).
-- [ ] **Carousel UI**: Design satisfying carousel/scroll components for browsing items and communities.
-- [ ] **High-Fidelity Detail View**: Create the simple, cool page that shows all data/bitstreams for a selected item.
+### 2. Resource Files (`resources`)
+*   Locate your existing `out` folder.
+*   Rename it to `resources`.
+*   Establish it at the root level, so the path is `trumpet_data/resources`.
+*   Inside, it should contain folders named by UUID (e.g., `6084e990-...`), which contain `items`, `bitstreams`, and `item_expanded.json`.
 
 ---
 
-## ❓ Clarifying Questions for the Stakeholder
+## ⚙️ Configuration
 
-1. **Visual Language**: When you say "simple and satisfying," are we thinking minimalist white space (Apple-style) or vibrant and immersive (Dark mode with glowing accents)?
-2. **Community Hierarchy**: Our data supports sub-communities. Should the user browse one level at a time, or see all sub-level items at once?
-3. **Collaboration**: How would you like us to split the work—one person on Backend and one on Frontend, or split by features (e.g., browsing vs. detail view)?
+The project is configured to look for these folders using absolute paths in `Trumpet.Backend/appsettings.json`.
+
+**Verify `appsettings.json`:**
+```json
+"ProjectSettings": {
+  "ResourcesPath": "C:/Path/To/Your/trumpet_data/resources",
+  "RawDataPath": "C:/Path/To/Your/trumpet_data/data/raw"
+}
+```
+*Note: Ensure these paths match your actual local file system location.*
+
+---
+
+## 🚀 Running the Import
+
+Once your files are in place:
+
+1.  **Start the Backend:**
+    ```powershell
+    cd Trumpet.Backend
+    dotnet run
+    ```
+    *(Ensure it is listening on http://localhost:5000)*
+
+2.  **Trigger Data Ingestion:**
+    Open a terminal and run the following command to populate the database:
+    ```bash
+    curl -X POST http://localhost:5000/api/import/extract
+    ```
+    *   This process runs in the background.
+    *   It imports Communities, Collections, and most importantly, parses `hierarchy.json` to link them correctly.
+    *   Finally, it ingests all Items from the `resources` folder.
+
+3.  **Verify:**
+    *   Visit `http://localhost:5000/api/communities` to see the structure.
+    *   Visit `http://localhost:5000/api/items/path-counts` to see item distribution.
+
+---
+
+## 🛠️ Troubleshooting
+
+*   **"No items in community":** This usually means the `hierarchy.json` file wasn't imported. Run the import command again.
+*   **"Directory not found":** Check `appsettings.json` and ensure the `RawDataPath` and `ResourcesPath` are correct absolute paths.
