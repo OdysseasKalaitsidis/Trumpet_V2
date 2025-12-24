@@ -1,17 +1,29 @@
-# Ignore huge data folders
-out/
+# .NET
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.sln.docstates
 
-# Ignore the database files
-*.db
-*.db-shm
-*.db-wal
+# Node / Frontend
+node_modules/
+dist/
+.eslintcache
+.vite/
 
-# Ignore compiled code folders
-**/bin/
-**/obj/
+# Database
+data/database/*.db
+data/database/*.db-shm
+data/database/*.db-wal
 
-# Ignore Mac system files
-.DS_Store
+# Resources (Static Assets)
+resources/*
+!resources/.gitkeep
 
-# Ignore VS Code local settings
+# IDEs
+.vs/
 .vscode/
+
+# OS
+.DS_Store
+Thumbs.db

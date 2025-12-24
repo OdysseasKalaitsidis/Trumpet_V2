@@ -1,46 +1,52 @@
-# Trumpet (Dev Setup)
+## 🚀 Vision
+A cool, satisfying, and simple "Apple-style" web application. The experience is designed as an "unfolding story": as users click, the archive reveals itself through levels of depth, from broad music paths to specific communities and items.
 
-Simple setup guide for the **Corfiot Music Paths** archive. This project uses Python to fetch files and .NET/SQLite to serve them locally.
+## 🎨 Visual Identity
+- **Apple Style**: Clean typography (Inter/SF Pro), plenty of white space (or sophisticated dark mode), subtle shadows, and premium glassmorphism.
+- **Interactivity**: Smooth carousels for the initial path selection and fluid transitions between levels.
+- **Micro-animations**: Satisfying feedback loops without overloading the user.
 
-## 🛠 Prerequisites
-* **Python 3** (for downloading files)
-* **[ .NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)** (for the app & database)
-* **Git**
+## 🎯 Strategic Goals
+1. **Path-first Entry**: Users land on 4 distinct "Music Paths":
+   - **Art Music** (Η μουσική του άστεως)
+   - **Urban Popular Music** (Η αστικολαϊκή μουσική)
+   - **Rural Music** (Η μουσική της υπαίθρου)
+   - **Sacred Music** (Η εκκλησιαστική μουσική)
+2. **Community Discovery**: Once inside a path, users discover and categorize data based on communities.
+3. **The "Unfolding" Story**: A level-based navigation that reveals metadata and bitstreams in a satisfying, simple way.
 
 ---
 
-## 🚀 How to Run
+## 🛠 Technical Strategy
 
-### 1. Clone & Setup
-Clone the repo and enter the folder:
-```bash
-git clone [https://github.com/giannisgks/trumpet.git](https://github.com/giannisgks/trumpet.git)
-cd trumpet
-```
-2. Download the Media (Python)
-The repo does not include the heavy PDFs/Audio. You must download them to your local out/ folder first.
-Run inside 'trumpet' directory:
+### Phase 1: The Backbone (Backend)
+- **Hierarchical API**: Expose communities and their sub-collections via a new `/api/communities` endpoint.
+- **Relational Filtering**: Extend `ItemsController` to allow fetching all items within a specific community (spanning multiple collections).
 
-```bash
-pip install requests
-python items_final.py
-```
-(This takes a while. It will create a local out/ folder with ~1GB of data.)
+### Phase 2: The Experience (Frontend)
+- **Community Landing Page**: A "Wow" entrance with cards or interactive elements representing the different music communities.
+- **Fluid Browser**: A seamless transition into the collections and items of a selected community.
+- **Deep Metadata View**: A dedicated component to render every piece of metadata we have, including audio/video players.
 
-3. Build the Database (C#)
-We use a local SQLite database (corfiot_music.db). It is not shared on Git; you must generate your own based on the files you just downloaded.
+---
 
-```bash
-cd Trumpet_Net
-dotnet run
-```
-Wait until you see "Done!" and "Imported X items".
+## 📋 Task List & Roles
 
-4. Run the Website (C#)
-Once the database is ready, start the web server to browse the collection.
+### 👨‍💻 Ody (Backend & Data)
+- [ ] **Hierarchical API**: Expose Communities and Collections in a way that supports "unfolding" levels.
+- [ ] **Path Filtering**: Implement logic to group communities by the 4 primary Music Paths.
+- [ ] **Metadata Engine**: Ensure all metadata fields are correctly retrieved for the detail view.
 
-```bash
-cd ../Trumpet_Web
-dotnet run
-```
-Click the http://localhost:xxxx link in your terminal to open the app.
+### 👨‍🎨 Giannis (Frontend & UX)
+- [ ] **Home Carousel**: Build the high-impact "Apple-style" carousel for the 4 Music Paths.
+- [ ] **Unfolding Navigation**: Implement the level-based routing/animation (Path -> Community -> Collection -> Item).
+- [ ] **Carousel UI**: Design satisfying carousel/scroll components for browsing items and communities.
+- [ ] **High-Fidelity Detail View**: Create the simple, cool page that shows all data/bitstreams for a selected item.
+
+---
+
+## ❓ Clarifying Questions for the Stakeholder
+
+1. **Visual Language**: When you say "simple and satisfying," are we thinking minimalist white space (Apple-style) or vibrant and immersive (Dark mode with glowing accents)?
+2. **Community Hierarchy**: Our data supports sub-communities. Should the user browse one level at a time, or see all sub-level items at once?
+3. **Collaboration**: How would you like us to split the work—one person on Backend and one on Frontend, or split by features (e.g., browsing vs. detail view)?
