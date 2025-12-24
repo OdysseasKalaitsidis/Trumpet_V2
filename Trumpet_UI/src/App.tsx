@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import HomePage from './HomePage';
-import ItemDetail from './ItemDetail';
-import SearchBox from './components/SearchBox';
+import React from "react";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import HomePage from "./HomePage";
+import ItemDetail from "./ItemDetail";
+import SearchBox from "./components/SearchBox";
 
 export default function App() {
   return (
@@ -10,12 +11,22 @@ export default function App() {
         <header>
           <nav className="navbar-glass px-4 py-3">
             <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between">
-              <Link className="text-2xl font-bold text-white no-underline mr-8" to="/">Trumpet_UI</Link>
+              <Link
+                className="text-2xl font-bold text-white no-underline mr-8"
+                to="/"
+              >
+                Trumpet_UI
+              </Link>
 
               <div className="flex-grow flex items-center justify-between">
                 <ul className="flex space-x-4 list-none m-0 p-0">
                   <li>
-                    <Link className="text-white hover:text-white/80 transition-colors no-underline font-medium" to="/">Home</Link>
+                    <Link
+                      className="text-white hover:text-white/80 transition-colors no-underline font-medium"
+                      to="/"
+                    >
+                      Home
+                    </Link>
                   </li>
                 </ul>
                 <div className="ml-4">
@@ -42,5 +53,5 @@ export default function App() {
         </footer>
       </div>
     </BrowserRouter>
-  )
+  );
 }
