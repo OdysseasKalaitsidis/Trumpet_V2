@@ -11,17 +11,25 @@ export function useItems(pathFilter: string, searchQuery: string, communityId?: 
     const load = async () => {
       setLoading(true);
       setError(null);
+      
+      console.log("[useItems] Starting fetch with:", { pathFilter, searchQuery, communityId });
+      
       try {
         let data: Item[];
         if (communityId) {
+          console.log("[useItems] Fetching community items for communityId:", communityId);
           data = await fetchCommunityItems(communityId);
+          console.log("[useItems] Community items response:", data);
         } else {
+          console.log("[useItems] Fetching items with path/search filters");
           data = await fetchItems(pathFilter, searchQuery);
+          console.log("[useItems] Items response:", data);
         }
+        console.log("[useItems] Total items fetched:", data.length);
         setItems(data);
       } catch (err) {
+        console.error("[useItems] Error fetching items:", err);
         setError(err instanceof Error ? err : new Error("Failed to fetch items"));
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -31,3 +39,4 @@ export function useItems(pathFilter: string, searchQuery: string, communityId?: 
 
   return { items, loading, error };
 }
+

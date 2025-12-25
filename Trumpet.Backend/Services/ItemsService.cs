@@ -48,7 +48,7 @@ public class ItemsService : IItemsService
             .ToListAsync<object>();
     }
 
-    public async Task<IEnumerable<Item>> GetItemsAsync(string? path, string? search, string? communityId, int page, int pageSize)
+    public async Task<IEnumerable<Item>> GetItemsAsync(string? path, string? search, string? communityId, string? collectionId, int page, int pageSize)
     {
         IQueryable<Item> query = _context.Items
             .Include(i => i.Metadata)
@@ -82,6 +82,12 @@ public class ItemsService : IItemsService
         if (!string.IsNullOrEmpty(communityId))
         {
             query = query.Where(i => i.CollectionId != null && _context.Collections.Any(c => c.Id == i.CollectionId && c.ParentCommunityId == communityId));
+        }
+
+        // Filter by collection ID
+        if (!string.IsNullOrEmpty(collectionId))
+        {
+            query = query.Where(i => i.CollectionId == collectionId);
         }
 
         if (!string.IsNullOrEmpty(search))

@@ -5,6 +5,7 @@ using Trumpet.Backend.Services;
 using Trumpet.Backend.Services.Items;
 using Trumpet.Backend.Services.Communities;
 using Trumpet.Backend.Services.CommunityItems;
+using Trumpet.Backend.Services.Collections;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,7 @@ builder.Services.AddScoped<IDataImportService, DataImportService>();
 builder.Services.AddScoped<IItemsService, ItemsService>();
 builder.Services.AddScoped<ICommunitiesService, CommunitiesService>();
 builder.Services.AddScoped<ICommunityItemsService, CommunityItemsService>();
+builder.Services.AddScoped<ICollectionsService, CollectionsService>();
 
 var app = builder.Build();
 

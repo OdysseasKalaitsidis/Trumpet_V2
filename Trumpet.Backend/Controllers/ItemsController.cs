@@ -46,10 +46,11 @@ public class ItemsController : ControllerBase
         [FromQuery] string? path, 
         [FromQuery] string? search, 
         [FromQuery] string? communityId,
+        [FromQuery] string? collectionId,
         [FromQuery] int page = 1, 
         [FromQuery] int pageSize = 10)
     {
-        return Ok(await _itemsService.GetItemsAsync(path, search, communityId, page, pageSize));
+        return Ok(await _itemsService.GetItemsAsync(path, search, communityId, collectionId, page, pageSize));
     }
 
     [HttpGet("{id}")]

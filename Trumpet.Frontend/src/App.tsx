@@ -2,60 +2,108 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import HomePage from "./pages/home/HomePage";
 import ItemDetail from "./pages/item-detail/ItemDetailPage";
 import SearchBox from "./components/SearchBox";
-import CommunityBrowser from "./pages/CommunityBrowser";
-import ItemsBrowser from "./pages/ItemsBrowser";
+import CommunitiesPage from "./pages/communities/CommunitiesPage";
+import ItemsPage from "./pages/items/ItemsPage";
+import { ThemeProvider, useTheme } from "./hooks/useTheme";
+
+function AppContent() {
+  const { theme, toggleTheme } = useTheme();
+
+
+  return (
+    <div 
+      className="flex flex-col min-h-screen transition-colors duration-300"
+      style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}
+    >
+      {/* Header */}
+      <header 
+        className="sticky top-0 z-50 border-b backdrop-blur-md"
+        style={{ 
+          borderColor: 'var(--color-border)',
+          backgroundColor: theme === 'dark' ? 'rgba(10,10,10,0.9)' : 'rgba(253,251,247,0.9)'
+        }}
+      >
+        <nav className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link
+            className="text-xl font-semibold tracking-tight no-underline flex items-center gap-2"
+            to="/"
+            style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--color-text)' }}
+          >
+            <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </span>
+            Trumpet
+          </Link>
+
+          <div className="flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-6 text-sm font-medium">
+              <Link to="/" className="transition-colors no-underline hover:text-amber-600" style={{ color: 'var(--color-text-muted)' }}>
+                Explore
+              </Link>
+              <Link to="/browse" className="transition-colors no-underline hover:text-amber-600" style={{ color: 'var(--color-text-muted)' }}>
+                Communities
+              </Link>
+            </div>
+            
+            {/* Theme Toggle */}
+            <button 
+              onClick={toggleTheme}
+              className="w-9 h-9 rounded-full border flex items-center justify-center transition-all hover:scale-110"
+              style={{ borderColor: 'var(--color-border)' }}
+              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              {theme === 'light' ? '🌙' : '☀️'}
+            </button>
+            
+            <SearchBox />
+          </div>
+        </nav>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 w-full max-w-6xl mx-auto px-6 py-12">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/browse" element={<CommunitiesPage />} />
+          <Route path="/items" element={<ItemsPage />} />
+          <Route path="/item/:id" element={<ItemDetail />} />
+        </Routes>
+      </main>
+
+      {/* Footer */}
+      <footer 
+        className="border-t py-10 text-sm"
+        style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg-warm)' }}
+      >
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2" style={{ color: 'var(--color-text-muted)' }}>
+            <span className="w-6 h-6 rounded bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </span>
+            © 2025 Trumpet — The Corfiot Music Archive
+          </div>
+          <div className="flex items-center gap-6" style={{ color: 'var(--color-text-muted)' }}>
+            <a href="#" className="hover:underline">About</a>
+            <a href="#" className="hover:underline">Contact</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
 
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="flex flex-col min-h-screen bg-[#050505] text-white selection:bg-white selection:text-black">
-        <header className="sticky top-0 z-50 backdrop-blur-2xl bg-black/60 border-b border-white/5">
-          <nav className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <Link
-              className="text-2xl font-black tracking-tighter text-white no-underline flex items-center gap-2 group"
-              to="/"
-            >
-              <span className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center text-lg transition-transform group-hover:rotate-12">🎺</span>
-              <span className="hidden sm:inline">TRUMPET</span>
-            </Link>
-
-            <div className="flex items-center gap-8">
-              <div className="hidden md:flex items-center gap-8 text-sm font-bold tracking-wide">
-                <Link to="/" className="text-white/40 hover:text-white transition-colors no-underline">ARCHIVE</Link>
-                <Link to="/" className="text-white/40 hover:text-white transition-colors no-underline">COMMUNITIES</Link>
-                <Link to="/" className="text-white/40 hover:text-white transition-colors no-underline">ABOUT</Link>
-              </div>
-              <div className="h-8 w-px bg-white/10 hidden sm:block" />
-              <SearchBox />
-            </div>
-          </nav>
-        </header>
-
-        <div className="flex-1 w-full max-w-7xl mx-auto px-6 pb-20">
-          <main role="main">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/browse" element={<CommunityBrowser />} />
-              <Route path="/items" element={<ItemsBrowser />} />
-              <Route path="/item/:id" element={<ItemDetail />} />
-            </Routes>
-          </main>
-        </div>
-
-        <footer className="border-t border-white/5 py-12 text-white/20 text-sm font-medium">
-          <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <span className="text-xl grayscale opacity-50">🎺</span>
-              &copy; 2025 The Corfiot Music Archive Project.
-            </div>
-            <div className="flex items-center gap-8">
-              <a href="#" className="hover:text-white transition-colors">Privacy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms</a>
-              <a href="#" className="hover:text-white transition-colors">Contact</a>
-            </div>
-          </div>
-        </footer>
-      </div>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
+
+
