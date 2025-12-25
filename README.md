@@ -40,11 +40,11 @@ The project is configured to look for these folders using absolute paths in `Tru
 **Verify `appsettings.json`:**
 ```json
 "ProjectSettings": {
-  "ResourcesPath": "C:/Path/To/Your/trumpet_data/resources",
-  "RawDataPath": "C:/Path/To/Your/trumpet_data/data/raw"
+  "ResourcesPath": "../resources",
+  "RawDataPath": "../data/raw"
 }
 ```
-*Note: Ensure these paths match your actual local file system location.*
+*Note: These relative paths work automatically on both Windows and Mac.*
 
 ---
 
@@ -71,6 +71,23 @@ Once your files are in place:
 3.  **Verify:**
     *   Visit `http://localhost:5000/api/communities` to see the structure.
     *   Visit `http://localhost:5000/api/items/path-counts` to see item distribution.
+
+### 4. Running the Frontend
+
+1.  Open a new terminal window/tab.
+2.  Navigate to the frontend directory:
+    ```bash
+    cd Trumpet.Frontend
+    ```
+3.  Install dependencies (first time only):
+    ```bash
+    npm install
+    ```
+4.  Start the development server:
+    ```bash
+    npm run dev
+    ```
+5.  Open your browser to the local URL (e.g., `http://localhost:5173`).
 
 ---
 
