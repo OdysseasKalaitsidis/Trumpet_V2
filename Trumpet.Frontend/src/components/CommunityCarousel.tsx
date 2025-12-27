@@ -138,7 +138,7 @@ export default function CommunityCarousel() {
 
           {/* View All button */}
           <Link
-            to="/browse"
+            to="/communities"
             className="px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 hover:scale-105"
             style={{
               background: 'linear-gradient(to right, #f59e0b, #ea580c)',

@@ -1,6 +1,7 @@
 import { useSearchParams, Link } from "react-router-dom";
 import { useItems } from "../../hooks/useItems";
 import { getPageTitle, getPageDescription } from "./api";
+import { paths } from "../../components/MusicPathsGrid";
 import { getMediaUrl } from "../../api/config";
 
 import { useState, useEffect } from 'react';
@@ -35,7 +36,10 @@ export default function ItemsPage() {
   }, [communityId, manifestFiles]);
 
   const pageTitle = getPageTitle({ search, communityName, pathName });
-  const pageDescription = getPageDescription({ search, communityName, pathName });
+  const pathMeta = paths.find(p => p.id === path);
+  const pageDescription = pathMeta
+    ? pathMeta.description
+    : getPageDescription({ search, communityName, pathName });
 
   return (
     <div className="animate-fade-in relative">
