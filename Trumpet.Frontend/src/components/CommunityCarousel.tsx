@@ -10,6 +10,7 @@ interface Community {
 
 export default function CommunityCarousel() {
   const [communities, setCommunities] = useState<Community[]>([]);
+  const [manifestFiles, setManifestFiles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -17,6 +18,12 @@ export default function CommunityCarousel() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    // Fetch manifest
+    fetch('/media/manifest.json')
+      .then(res => res.json())
+      .then(data => setManifestFiles(data.files || []))
+      .catch(err => console.error('Failed to load media manifest:', err));
+
     fetch(`${API_BASE_URL}/api/communities`)
       .then(res => res.json())
       .then(data => {
@@ -78,7 +85,7 @@ export default function CommunityCarousel() {
   const visibleCommunities = communities.length >= 3 ? getVisibleCommunities() : communities;
 
   return (
-    <div 
+    <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="relative"
@@ -95,7 +102,7 @@ export default function CommunityCarousel() {
           </h2>
           <p className="section-subtitle">Organizations preserving Corfiot music</p>
         </div>
-        
+
         <div className="flex items-center gap-4">
           {/* Navigation arrows */}
           <div className="flex gap-2">
@@ -130,10 +137,10 @@ export default function CommunityCarousel() {
           </div>
 
           {/* View All button */}
-          <Link 
-            to="/browse"
+          <Link
+            to="/communities"
             className="px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 hover:scale-105"
-            style={{ 
+            style={{
               background: 'linear-gradient(to right, #f59e0b, #ea580c)',
               color: 'white'
             }}
@@ -153,11 +160,10 @@ export default function CommunityCarousel() {
                     setIsTransitioning(false);
                   }, 200);
                 }}
-                className={`h-2 rounded-full transition-all duration-500 ${
-                  i === currentIndex % communities.length 
-                    ? 'w-8 bg-gradient-to-r from-amber-500 to-orange-500' 
-                    : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-amber-300'
-                }`}
+                className={`h-2 rounded-full transition-all duration-500 ${i === currentIndex % communities.length
+                  ? 'w-8 bg-gradient-to-r from-amber-500 to-orange-500'
+                  : 'w-2 bg-gray-300 dark:bg-gray-600 hover:bg-amber-300'
+                  }`}
               />
             ))}
           </div>
@@ -169,38 +175,53 @@ export default function CommunityCarousel() {
           <Link
             key={`${c.id}-${currentIndex}-${i}`}
             to={`/items?communityId=${c.id}&communityName=${encodeURIComponent(c.name)}`}
-            className="group relative p-6 rounded-2xl border bg-white dark:bg-gray-900 no-underline overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
-            style={{ 
+            className="group relative p-6 rounded-2xl border bg-white dark:bg-black no-underline overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
+            style={{
               borderColor: 'var(--color-border)',
               animation: `slideIn 0.5s ease-out ${i * 100}ms backwards`
             }}
           >
             {/* Animated gradient overlay on hover */}
             <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 via-transparent to-orange-500/0 group-hover:from-amber-500/5 group-hover:to-orange-500/10 transition-all duration-700" />
-            
+
             {/* Animated accent bar */}
             <div className="w-12 h-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 mb-5 group-hover:w-20 transition-all duration-500 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             </div>
-            
+
             {/* Floating decorative element */}
-            <div 
+            <div
               className="absolute top-4 right-4 text-4xl opacity-10 group-hover:opacity-30 group-hover:scale-110 transition-all duration-500"
               style={{ animation: 'float 3s ease-in-out infinite', animationDelay: `${i * 200}ms` }}
             >
               🎵
             </div>
-            
-            <h3 
-              className="text-lg font-bold mb-2 line-clamp-2 group-hover:text-amber-600 transition-colors relative z-10"
-              style={{ 
-                fontFamily: "'Playfair Display', Georgia, serif",
-                color: 'var(--color-text)'
-              }}
-            >
-              {c.name}
-            </h3>
-            <p 
+
+            <div className="flex items-center gap-4 mb-2 relative z-10">
+              {(() => {
+                const logoFile = manifestFiles.find(f => f.includes(c.id));
+                return (
+                  <img
+                    src={logoFile ? `/media/${logoFile}` : `/media/${c.id}.png`}
+                    alt={`${c.name} logo`}
+                    className="w-12 h-12 object-contain rounded-full bg-white/10 p-1"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                );
+              })()}
+              <h3
+                className="text-lg font-bold line-clamp-2 group-hover:text-amber-600 transition-colors"
+                style={{
+                  fontFamily: "'Playfair Display', Georgia, serif",
+                  color: 'var(--color-text)'
+                }}
+              >
+                {c.name}
+              </h3>
+            </div>
+            <p
               className="text-sm line-clamp-2 mb-4"
               style={{ color: 'var(--color-text-muted)' }}
             >
@@ -221,19 +242,19 @@ export default function CommunityCarousel() {
 
       {/* Progress bar showing time until next rotation */}
       <div className="mt-6">
-        <div 
+        <div
           className="h-0.5 rounded-full overflow-hidden"
           style={{ backgroundColor: 'var(--color-border)' }}
         >
-          <div 
+          <div
             className="h-full rounded-full transition-all duration-100 ease-linear"
-            style={{ 
+            style={{
               width: isHovered ? '0%' : `${progress}%`,
               background: 'linear-gradient(to right, #f59e0b, #ea580c)'
             }}
           />
         </div>
-       
+
       </div>
 
       {/* CSS Keyframes (injected via style tag) */}
