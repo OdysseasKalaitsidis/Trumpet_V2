@@ -84,10 +84,7 @@ public class ItemsService : IItemsService
             query = query.Where(i => i.CollectionId != null && _context.Collections.Any(c => c.Id == i.CollectionId && c.ParentCommunityId == communityId));
         }
 
-<<<<<<< HEAD:Trumpet.Backend/Services/Items/ItemsService.cs
-=======
         // Filter by collection ID
->>>>>>> 5dd90944b3a00ebaa33fd1a726e1e8cb20bf0166:Trumpet.Backend/Services/ItemsService.cs
         if (!string.IsNullOrEmpty(collectionId))
         {
             query = query.Where(i => i.CollectionId == collectionId);

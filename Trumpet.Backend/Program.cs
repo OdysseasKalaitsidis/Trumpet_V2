@@ -5,12 +5,9 @@ using Trumpet.Backend.Services;
 using Trumpet.Backend.Services.Items;
 using Trumpet.Backend.Services.Communities;
 using Trumpet.Backend.Services.CommunityItems;
-<<<<<<< HEAD
 using Trumpet.Backend.Services.Tagging;
 using Trumpet.Backend.Services.Recommendations;
-=======
 using Trumpet.Backend.Services.Collections;
->>>>>>> 5dd90944b3a00ebaa33fd1a726e1e8cb20bf0166
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,12 +40,9 @@ builder.Services.AddScoped<IDataImportService, DataImportService>();
 builder.Services.AddScoped<IItemsService, ItemsService>();
 builder.Services.AddScoped<ICommunitiesService, CommunitiesService>();
 builder.Services.AddScoped<ICommunityItemsService, CommunityItemsService>();
-<<<<<<< HEAD
 builder.Services.AddScoped<ITaggingService, AITaggingService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
-=======
 builder.Services.AddScoped<ICollectionsService, CollectionsService>();
->>>>>>> 5dd90944b3a00ebaa33fd1a726e1e8cb20bf0166
 
 var app = builder.Build();
 
