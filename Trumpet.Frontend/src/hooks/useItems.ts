@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import type { Item } from "../models/domain";
 import { fetchItems, fetchCommunityItems } from "../pages/home/api";
 
-export function useItems(pathFilter: string, searchQuery: string, communityId?: string) {
+export function useItems(pathFilter: string, searchQuery: string, communityId?: string, collectionId?: string) {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -13,7 +13,10 @@ export function useItems(pathFilter: string, searchQuery: string, communityId?: 
       setError(null);
       try {
         let data: Item[];
-        if (communityId) {
+        // Prioritize collectionId if present, even within a community context
+        if (collectionId) {
+          data = await fetchItems(undefined, searchQuery, undefined, collectionId);
+        } else if (communityId) {
           data = await fetchCommunityItems(communityId);
         } else {
           data = await fetchItems(pathFilter, searchQuery);
@@ -27,7 +30,7 @@ export function useItems(pathFilter: string, searchQuery: string, communityId?: 
       }
     };
     load();
-  }, [pathFilter, searchQuery, communityId]);
+  }, [pathFilter, searchQuery, communityId, collectionId]);
 
   return { items, loading, error };
 }

@@ -42,7 +42,7 @@ export default function CommunityCarousel() {
           {communities.map((c) => (
             <Link
               key={c.id}
-              to={`/items?communityId=${c.id}&communityName=${encodeURIComponent(c.name)}`}
+              to={`/browse?communityId=${c.id}`}
               className="flex-shrink-0 w-80 p-8 rounded-[2rem] bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-300 group"
             >
               <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">

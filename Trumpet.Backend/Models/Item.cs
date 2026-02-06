@@ -12,6 +12,9 @@ public class Item
     public bool Withdrawn { get; set; }
     public bool Archived { get; set; }
     public string CollectionId { get; set; } = "";
+    [ForeignKey("CollectionId")]
+    public Collection? Collection { get; set; }
+
     public List<MetadataValue> Metadata { get; set; } = new();
     public List<Bitstream> Bitstreams { get; set; } = new();
 }

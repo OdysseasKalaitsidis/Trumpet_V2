@@ -7,22 +7,34 @@ export default function ItemsBrowser() {
   const path = searchParams.get("path") || "";
   const pathName = searchParams.get("pathName") || "Archive";
   const communityName = searchParams.get("communityName") || "";
+  const collectionId = searchParams.get("collectionId") || "";
+  const collectionName = searchParams.get("collectionName") || "";
   
-  const { items, loading } = useItems(path, "", communityId);
+  const { items, loading } = useItems(path, "", communityId, collectionId);
 
-  const pageTitle = communityName || pathName || "Archive Items";
-  const showBreadcrumbs = !!communityName && !!pathName;
+  const pageTitle = collectionName || communityName || pathName || "Archive Items";
+  const showBreadcrumbs = !!collectionName || (!!communityName && !!pathName);
 
   return (
     <div className="py-12 animate-fade-in">
       <div className="mb-16">
         {showBreadcrumbs ? (
-          <nav className="flex items-center gap-2 text-white/40 font-medium mb-4 text-sm">
+          <nav className="flex items-center gap-2 text-white/40 font-medium mb-4 text-sm flex-wrap">
             <Link to="/" className="hover:text-white transition-colors">Paths</Link>
             <span>/</span>
             <span className="text-white/60">{pathName}</span>
-            <span>/</span>
-            <span className="text-white/60">{communityName}</span>
+            {communityName && (
+              <>
+                <span>/</span>
+                <Link to={`/communities?path=${path}`} className="hover:text-white transition-colors">{communityName}</Link>
+              </>
+            )}
+            {collectionName && (
+              <>
+                <span>/</span>
+                <span className="text-white/60">{collectionName}</span>
+              </>
+            )}
           </nav>
         ) : (
           <nav className="flex items-center gap-2 text-white/40 font-medium mb-4 text-sm">
@@ -36,9 +48,11 @@ export default function ItemsBrowser() {
           {pageTitle}
         </h1>
         <p className="text-xl text-white/50 mt-4 max-w-2xl font-medium">
-          {communityName 
-            ? `Explore the curated musical assets and archival records of ${communityName}.`
-            : `Discover all items belonging to the ${pathName} music path.`}
+          {collectionName
+            ? `Exploring items within the "${collectionName}" collection.`
+            : communityName 
+              ? `Explore the curated musical assets and archival records of ${communityName}.`
+              : `Discover all items belonging to the ${pathName} music path.`}
         </p>
       </div>
 
@@ -65,9 +79,22 @@ export default function ItemsBrowser() {
                 <h3 className="text-xl font-bold text-white mb-1 group-hover:text-white transition-colors line-clamp-2 leading-tight">
                   {item.name}
                 </h3>
-                <p className="text-white/40 text-sm font-medium">
+                <p className="text-white/40 text-sm font-medium mb-3">
                   {item.metadata.find(m => m.field === "dc.contributor.author")?.value || "Unknown Archive"}
                 </p>
+
+                {/* Display Tags (Max 3) */}
+                <div className="flex flex-wrap gap-1.5 mt-auto">
+                    {item.metadata
+                        .filter(m => m.field === "trumpet.tag")
+                        .slice(0, 3)
+                        .map((tag, idx) => (
+                            <span key={idx} className="px-2 py-0.5 rounded bg-white/10 text-[10px] font-bold text-white/70 uppercase tracking-widest border border-white/5">
+                                {tag.value}
+                            </span>
+                        ))
+                    }
+                </div>
               </div>
             </Link>
           ))}

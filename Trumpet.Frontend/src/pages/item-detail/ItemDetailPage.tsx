@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import type { Bitstream } from '../../models/domain';
+import type { Bitstream, Item } from '../../models/domain';
 import { getMediaUrl } from '../../api/config';
 import { useItem } from '../../hooks/useItem';
+import { fetchRecommendations } from '../home/api';
 
 import LeafletMap from '../../components/LeafletMap';
 
@@ -10,6 +11,14 @@ export default function ItemDetail() {
     const { id } = useParams<{ id: string }>();
     const { item, loading } = useItem(id);
     const [selectedFile, setSelectedFile] = useState<Bitstream | null>(null);
+    const [recommendations, setRecommendations] = useState<Item[]>([]);
+    const [showMetadata, setShowMetadata] = useState(false);
+    
+    useEffect(() => {
+        if (id) {
+            fetchRecommendations(id).then(setRecommendations).catch(console.error);
+        }
+    }, [id]);
 
     if (loading) return <div className="container mt-5">Loading...</div>;
     if (!item) return <div className="container mt-5">Item not found.</div>;
@@ -117,6 +126,15 @@ export default function ItemDetail() {
                         <p className="text-2xl text-white/50 font-medium leading-relaxed">
                             {getContributors() || 'Unknown Archivist'}
                         </p>
+                        
+                        {/* Tags Display */}
+                        <div className="flex flex-wrap gap-2 mt-6">
+                            {item.metadata.filter(m => m.field === 'trumpet.tag').map((tag, idx) => (
+                                <span key={idx} className="px-3 py-1 rounded-lg bg-white/10 border border-white/10 text-xs font-bold text-white/80 uppercase tracking-wider">
+                                    {tag.value}
+                                </span>
+                            ))}
+                        </div>
                     </div>
 
                     {mainMedia && (
@@ -191,32 +209,79 @@ export default function ItemDetail() {
                 </div>
             </div>
 
+
+
+            {/* Recommendations Section */}
+            {recommendations.length > 0 && (
+                <div className="mt-32 border-t border-white/5 pt-16">
+                     <h2 className="text-3xl font-black text-white tracking-tighter mb-12 flex items-center gap-4">
+                        <span className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-sm">✨</span>
+                        You Might Also Like
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {recommendations.map(rec => (
+                            <Link
+                                key={rec.id}
+                                to={`/item/${rec.id}`}
+                                className="group relative bg-white/5 border border-white/10 rounded-3xl overflow-hidden hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full"
+                            >
+                                <div className="aspect-[4/5] bg-white/5 flex items-center justify-center relative overflow-hidden">
+                                     <span className="text-4xl group-hover:scale-110 transition-transform duration-700">🎵</span>
+                                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                </div>
+                                
+                                <div className="p-6 flex-grow flex flex-col justify-end">
+                                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-white transition-colors line-clamp-2 leading-tight">
+                                        {rec.name}
+                                    </h3>
+                                    <p className="text-white/40 text-xs font-medium">
+                                        {rec.metadata.find(m => m.field === "dc.contributor.author")?.value || "Unknown Archive"}
+                                    </p>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Expanded Metadata Table */}
             <div className="mt-32 pt-16 border-t border-white/5">
-                <h2 className="text-3xl font-black text-white tracking-tighter mb-12 flex items-center gap-4">
-                    <span className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-sm">📊</span>
-                    Extended Archival Record
-                </h2>
-                <div className="rounded-[2.5rem] overflow-hidden bg-white/[0.02] border border-white/5 backdrop-blur-3xl shadow-3xl">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="border-b border-white/5">
-                                <th className="p-8 text-xs font-black tracking-widest text-white/30 uppercase">Archival Field</th>
-                                <th className="p-8 text-xs font-black tracking-widest text-white/30 uppercase">Record Value</th>
-                                <th className="p-8 text-xs font-black tracking-widest text-white/30 uppercase w-32">Index</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/[0.02]">
-                            {item.metadata.map((m, idx) => (
-                                <tr key={idx} className="hover:bg-white/[0.03] transition-colors group">
-                                    <td className="p-8 font-mono text-xs text-white/20 group-hover:text-white/60 transition-colors uppercase tracking-tight">{m.field}</td>
-                                    <td className="p-8 text-sm font-bold text-white/80 leading-relaxed max-w-2xl">{m.value}</td>
-                                    <td className="p-8 text-xs font-black text-white/10">{m.language || 'LOC'}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="flex items-center justify-between mb-12">
+                     <h2 className="text-3xl font-black text-white tracking-tighter flex items-center gap-4">
+                        <span className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-sm">📊</span>
+                        Extended Archival Record
+                    </h2>
+                    <button 
+                        onClick={() => setShowMetadata(!showMetadata)}
+                        className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-sm tracking-wide hover:bg-white/10 transition-colors flex items-center gap-3"
+                    >
+                        {showMetadata ? 'Hide Metadata' : 'View Full Record'}
+                        <span className={`transform transition-transform duration-300 ${showMetadata ? 'rotate-180' : ''}`}>▼</span>
+                    </button>
                 </div>
+                
+                {showMetadata && (
+                    <div className="rounded-[2.5rem] overflow-hidden bg-white/[0.02] border border-white/5 backdrop-blur-3xl shadow-3xl animate-fade-in">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="border-b border-white/5">
+                                    <th className="p-8 text-xs font-black tracking-widest text-white/30 uppercase">Archival Field</th>
+                                    <th className="p-8 text-xs font-black tracking-widest text-white/30 uppercase">Record Value</th>
+                                    <th className="p-8 text-xs font-black tracking-widest text-white/30 uppercase w-32">Index</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-white/[0.02]">
+                                {item.metadata.map((m, idx) => (
+                                    <tr key={idx} className="hover:bg-white/[0.03] transition-colors group">
+                                        <td className="p-8 font-mono text-xs text-white/20 group-hover:text-white/60 transition-colors uppercase tracking-tight">{m.field}</td>
+                                        <td className="p-8 text-sm font-bold text-white/80 leading-relaxed max-w-2xl">{m.value}</td>
+                                        <td className="p-8 text-xs font-black text-white/10">{m.language || 'LOC'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </div>
 
             {selectedFile && (

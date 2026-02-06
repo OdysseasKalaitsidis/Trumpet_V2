@@ -10,5 +10,8 @@ public class Collection
     public string Handle { get; set; } = "";
     public string? IntroductoryText { get; set; }
     public string? ParentCommunityId { get; set; }
+    [ForeignKey("ParentCommunityId")]
+    public Community? ParentCommunity { get; set; }
+    
     public List<Item> Items { get; set; } = new();
 }

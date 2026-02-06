@@ -16,7 +16,9 @@ public class CommunitiesService : ICommunitiesService
     public async Task<IEnumerable<Community>> GetCommunitiesAsync(string? path)
     {
         IQueryable<Community> query = _context.Communities
-            .Include(c => c.Collections);
+            .Include(c => c.Collections)
+            .Include(c => c.SubCommunities)
+                .ThenInclude(sc => sc.Collections);
 
         if (!string.IsNullOrEmpty(path))
         {
@@ -44,6 +46,8 @@ public class CommunitiesService : ICommunitiesService
     {
         return await _context.Communities
             .Include(c => c.Collections)
+            .Include(c => c.SubCommunities)
+                .ThenInclude(sc => sc.Collections)
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 }

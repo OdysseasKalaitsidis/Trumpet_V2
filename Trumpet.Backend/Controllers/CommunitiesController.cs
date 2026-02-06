@@ -20,7 +20,16 @@ public class CommunitiesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Community>>> GetCommunities([FromQuery] string? path)
     {
-        return Ok(await _communitiesService.GetCommunitiesAsync(path));
+        var communities = await _communitiesService.GetCommunitiesAsync(path);
+        foreach (var c in communities)
+        {
+             Console.WriteLine($"[DEBUG] Community: {c.Name} ({c.Id}) - Collections: {c.Collections?.Count ?? 0}, SubCommunities: {c.SubCommunities?.Count ?? 0}");
+             foreach(var col in c.Collections ?? new List<Collection>())
+             {
+                 Console.WriteLine($"   -> Collection: {col.Name} ({col.Id}) - ParentId: {col.ParentCommunityId}");
+             }
+        }
+        return Ok(communities);
     }
 
     [HttpGet("{id}")]

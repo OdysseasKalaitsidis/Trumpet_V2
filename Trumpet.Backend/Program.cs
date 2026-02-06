@@ -5,11 +5,17 @@ using Trumpet.Backend.Services;
 using Trumpet.Backend.Services.Items;
 using Trumpet.Backend.Services.Communities;
 using Trumpet.Backend.Services.CommunityItems;
+using Trumpet.Backend.Services.Tagging;
+using Trumpet.Backend.Services.Recommendations;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -33,6 +39,8 @@ builder.Services.AddScoped<IDataImportService, DataImportService>();
 builder.Services.AddScoped<IItemsService, ItemsService>();
 builder.Services.AddScoped<ICommunitiesService, CommunitiesService>();
 builder.Services.AddScoped<ICommunityItemsService, CommunityItemsService>();
+builder.Services.AddScoped<ITaggingService, AITaggingService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 
 var app = builder.Build();
 
