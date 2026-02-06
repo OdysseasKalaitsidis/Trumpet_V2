@@ -13,11 +13,13 @@ public class DataImportService : IDataImportService
 {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _env;
 
-    public DataImportService(IServiceScopeFactory scopeFactory, IConfiguration configuration)
+    public DataImportService(IServiceScopeFactory scopeFactory, IConfiguration configuration, IWebHostEnvironment env)
     {
         _scopeFactory = scopeFactory;
         _configuration = configuration;
+        _env = env;
     }
 
     public void ImportData()
@@ -38,8 +40,8 @@ public class DataImportService : IDataImportService
         string resourcesDir = _configuration["ProjectSettings:ResourcesPath"] ?? "../resources";
 
         // Handle relative paths
-        if (!Path.IsPathRooted(rawDataDir)) rawDataDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, rawDataDir));
-        if (!Path.IsPathRooted(resourcesDir)) resourcesDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, resourcesDir));
+        if (!Path.IsPathRooted(rawDataDir)) rawDataDir = Path.GetFullPath(Path.Combine(_env.ContentRootPath, rawDataDir));
+        if (!Path.IsPathRooted(resourcesDir)) resourcesDir = Path.GetFullPath(Path.Combine(_env.ContentRootPath, resourcesDir));
         
         if (!Directory.Exists(rawDataDir))
         {

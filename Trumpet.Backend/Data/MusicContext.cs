@@ -13,6 +13,16 @@ public class MusicContext : DbContext
 
     public MusicContext(DbContextOptions<MusicContext> options) : base(options) { }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Configure Community -> Collection relationship
+        modelBuilder.Entity<Collection>()
+            .HasOne<Community>()
+            .WithMany(c => c.Collections)
+            .HasForeignKey(col => col.ParentCommunityId)
+            .IsRequired(false);
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         // Configuration is handled via Dependency Injection in Program.cs
