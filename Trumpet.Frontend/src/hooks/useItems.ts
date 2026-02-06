@@ -16,15 +16,10 @@ export function useItems(pathFilter: string, searchQuery: string, communityId?: 
       
       try {
         let data: Item[];
-<<<<<<< HEAD
         // Prioritize collectionId if present, even within a community context
         if (collectionId) {
           data = await fetchItems(undefined, searchQuery, undefined, collectionId);
         } else if (communityId) {
-=======
-        if (communityId) {
-          console.log("[useItems] Fetching community items for communityId:", communityId);
->>>>>>> 5dd90944b3a00ebaa33fd1a726e1e8cb20bf0166
           data = await fetchCommunityItems(communityId);
           console.log("[useItems] Community items response:", data);
         } else {

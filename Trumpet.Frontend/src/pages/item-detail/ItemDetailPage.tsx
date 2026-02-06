@@ -246,13 +246,12 @@ export default function ItemDetail() {
             )}
 
             {/* Expanded Metadata Table */}
-<<<<<<< HEAD
             <div className="mt-32 pt-16 border-t border-white/5">
                 <div className="flex items-center justify-between mb-12">
                      <h2 className="text-3xl font-black text-white tracking-tighter flex items-center gap-4">
                         <span className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-sm">📊</span>
                         Extended Archival Record
-                    </h2>
+                     </h2>
                     <button 
                         onClick={() => setShowMetadata(!showMetadata)}
                         className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-sm tracking-wide hover:bg-white/10 transition-colors flex items-center gap-3"
@@ -260,32 +259,6 @@ export default function ItemDetail() {
                         {showMetadata ? 'Hide Metadata' : 'View Full Record'}
                         <span className={`transform transition-transform duration-300 ${showMetadata ? 'rotate-180' : ''}`}>▼</span>
                     </button>
-=======
-            <div className="mt-32 pt-16 border-t border-theme-border">
-                <h2 className="text-3xl font-black text-theme-text tracking-tighter mb-12 flex items-center gap-4">
-                    <span className="w-8 h-8 rounded-lg bg-theme-surface flex items-center justify-center text-sm">📊</span>
-                    Extended Archival Record
-                </h2>
-                <div className="rounded-[2.5rem] overflow-hidden bg-theme-surface border border-theme-border backdrop-blur-3xl shadow-3xl">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="border-b border-theme-border">
-                                <th className="p-8 text-xs font-black tracking-widest text-theme-text-light uppercase">Archival Field</th>
-                                <th className="p-8 text-xs font-black tracking-widest text-theme-text-light uppercase">Record Value</th>
-                                <th className="p-8 text-xs font-black tracking-widest text-theme-text-light uppercase w-32">Index</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-theme-border">
-                            {item.metadata.map((m, idx) => (
-                                <tr key={idx} className="hover:bg-theme-bg-muted transition-colors group">
-                                    <td className="p-8 font-mono text-xs text-theme-text-light group-hover:text-theme-text-muted transition-colors uppercase tracking-tight">{m.field}</td>
-                                    <td className="p-8 text-sm font-bold text-theme-text leading-relaxed max-w-2xl">{m.value}</td>
-                                    <td className="p-8 text-xs font-black text-theme-text-light">{m.language || 'LOC'}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
->>>>>>> 5dd90944b3a00ebaa33fd1a726e1e8cb20bf0166
                 </div>
                 
                 {showMetadata && (
