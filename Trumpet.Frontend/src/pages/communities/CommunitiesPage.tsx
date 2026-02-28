@@ -2,9 +2,12 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { fetchCommunities, getPathTitle } from './api';
 import { Community } from './models';
+import { useLanguage } from '../../hooks/useLanguage';
+import { tr } from '../../i18n/translations';
 
 export default function CommunitiesPage() {
   const [searchParams] = useSearchParams();
+  const { language } = useLanguage();
   const path = searchParams.get('path');
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,17 +56,17 @@ export default function CommunitiesPage() {
           className="inline-flex items-center gap-2 mb-6 text-sm font-medium transition-all hover:gap-3"
           style={{ color: 'var(--color-accent)' }}
         >
-          ← Back to Home
+          {tr(language, 'communities.backToHome')}
         </Link>
 
         <h1
           className="text-4xl md:text-5xl font-bold mb-4"
           style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--color-text)' }}
         >
-          {getPathTitle(path)}
+          {getPathTitle(path, language)}
         </h1>
         <p className="text-lg max-w-2xl" style={{ color: 'var(--color-text-muted)' }}>
-          Explore communities preserving Corfu's rich musical heritage. Each organization holds unique collections of recordings, documents, and artifacts.
+          {tr(language, 'communities.subtitle')}
         </p>
 
         {/* Search bar */}
@@ -75,7 +78,7 @@ export default function CommunitiesPage() {
             <span className="pl-4 opacity-50">🔍</span>
             <input
               type="text"
-              placeholder="Search communities..."
+              placeholder={tr(language, 'communities.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-3 bg-transparent border-none outline-none"
@@ -107,25 +110,20 @@ export default function CommunitiesPage() {
 
       {/* Communities Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map(i => (
-            <div
-              key={i}
-              className="h-64 rounded-2xl animate-pulse"
-              style={{ backgroundColor: 'var(--color-bg-muted)' }}
-            />
-          ))}
+        <div className="col-span-full py-16 text-center" style={{ color: 'var(--color-text-muted)' }}>
+          <div className="inline-block w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+          <p className="mt-4">{tr(language, 'communities.loading')}</p>
         </div>
       ) : filteredCommunities.length === 0 ? (
         <div className="py-16 text-center" style={{ color: 'var(--color-text-muted)' }}>
           <div className="text-6xl mb-4 opacity-30">🔍</div>
-          <p className="text-xl">No communities found matching "{searchTerm}"</p>
+          <p className="text-xl">{tr(language, 'communities.noResults')} "{searchTerm}"</p>
           <button
             onClick={() => setSearchTerm('')}
             className="mt-4 px-6 py-2 rounded-lg font-medium"
             style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}
           >
-            Clear search
+            {tr(language, 'communities.clearSearch')}
           </button>
         </div>
       ) : (
@@ -176,12 +174,12 @@ export default function CommunitiesPage() {
                 className="text-sm line-clamp-3 mb-6"
                 style={{ color: 'var(--color-text-muted)' }}
               >
-                {comm.introductoryText || "Discover this community's unique musical heritage and explore their collection of archival materials."}
+                {comm.introductoryText || tr(language, 'communities.fallbackDescription')}
               </p>
 
               {/* Explore button */}
               <div className="flex items-center gap-2 text-amber-500 font-semibold opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                <span>Explore Collection</span>
+                <span>{tr(language, 'communities.exploreCollection')}</span>
                 <span className="group-hover:translate-x-2 transition-transform">→</span>
               </div>
 

@@ -24,15 +24,15 @@ export async function fetchItems(
   }
 
   console.log("[fetchItems] Requesting URL:", url);
-  
+
   const response = await fetch(url);
   console.log("[fetchItems] Response status:", response.status);
-  
+
   if (!response.ok) {
     console.error("[fetchItems] Request failed:", response.statusText);
     throw new Error("Failed to fetch items");
   }
-  
+
   const data = await response.json();
   console.log("[fetchItems] Response data:", data);
   return data;
@@ -43,23 +43,18 @@ export const fetchPaths = async (): Promise<any[]> => {
   return await response.json();
 };
 
-export const fetchRecommendations = async (itemId: string): Promise<Item[]> => {
-    const response = await fetch(`${API_BASE_URL}/items/${itemId}/recommendations`);
-    return await response.json();
-  };
-
 export async function fetchCommunityItems(communityId: string): Promise<Item[]> {
   const url = `${API_BASE_URL}/api/CommunityItems/${communityId}`;
   console.log("[fetchCommunityItems] Requesting URL:", url);
-  
+
   const response = await fetch(url);
   console.log("[fetchCommunityItems] Response status:", response.status);
-  
+
   if (!response.ok) {
     console.error("[fetchCommunityItems] Request failed:", response.statusText);
     throw new Error("Failed to fetch community items");
   }
-  
+
   const data = await response.json();
   console.log("[fetchCommunityItems] Response data:", data);
   return data;

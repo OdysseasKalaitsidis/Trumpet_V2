@@ -3,11 +3,15 @@ import { useItems } from "../../hooks/useItems";
 import { getPageTitle, getPageDescription } from "./api";
 import { paths } from "../../components/MusicPathsGrid";
 import { getMediaUrl } from "../../api/config";
+import { useLanguage } from "../../hooks/useLanguage";
+import { getLocalizedTitle, getLocalizedContributor } from "../../i18n/localize";
+import { tr } from "../../i18n/translations";
 
 import { useState, useEffect } from 'react';
 
 export default function ItemsPage() {
   const [searchParams] = useSearchParams();
+  const { language } = useLanguage();
   const communityId = searchParams.get("communityId") || "";
   const path = searchParams.get("path") || "";
   const search = searchParams.get("search") || "";
@@ -38,7 +42,7 @@ export default function ItemsPage() {
   const pageTitle = getPageTitle({ search, communityName, pathName });
   const pathMeta = paths.find(p => p.id === path);
   const pageDescription = pathMeta
-    ? pathMeta.description
+    ? tr(language, pathMeta.descriptionKey)
     : getPageDescription({ search, communityName, pathName });
 
   return (
@@ -175,10 +179,10 @@ export default function ItemsPage() {
                   className="font-semibold mb-1 line-clamp-2 group-hover:text-amber-600 transition-colors"
                   style={{ color: 'var(--color-text)' }}
                 >
-                  {item.name}
+                  {getLocalizedTitle(item, language)}
                 </h3>
                 <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                  {item.metadata.find(m => m.field === "dc.contributor.author")?.value || "Unknown"}
+                  {getLocalizedContributor(item, language) || 'Unknown'}
                 </p>
 
                 {/* View arrow */}
