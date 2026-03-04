@@ -15,12 +15,9 @@ public class MusicContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configure Community -> Collection relationship
-        modelBuilder.Entity<Collection>()
-            .HasOne<Community>()
-            .WithMany(c => c.Collections)
-            .HasForeignKey(col => col.ParentCommunityId)
-            .IsRequired(false);
+        // Relationships are configured via [ForeignKey] attributes on the models.
+        // Do NOT re-configure them here — doing so causes EF to create duplicate
+        // shadow FK columns (e.g. ParentCommunityId1) which breaks all queries.
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)

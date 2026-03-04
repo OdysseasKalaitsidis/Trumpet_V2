@@ -8,3 +8,8 @@ export async function fetchItem(id: string): Promise<Item> {
   }
   return response.json();
 }
+
+export const fetchRecommendations = async (itemId: string): Promise<Item[]> => {
+  const response = await fetch(`${API_BASE_URL}/api/items/${itemId}/recommendations`);
+  return await response.json();
+};

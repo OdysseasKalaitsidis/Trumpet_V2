@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import HomePage from "./pages/home/HomePage";
 import ItemDetail from "./pages/item-detail/ItemDetailPage";
@@ -6,10 +7,60 @@ import CommunitiesPage from "./pages/communities/CommunitiesPage";
 import MusicPathsPage from "./pages/music-paths/MusicPathsPage";
 import ItemsPage from "./pages/items/ItemsPage";
 import { ThemeProvider, useTheme } from "./hooks/useTheme";
+import { LanguageProvider, useLanguage, LANGUAGES } from "./hooks/useLanguage";
+import { tr } from "./i18n/translations";
+
+function LanguageSwitcher() {
+  const { language, setLanguage } = useLanguage();
+  const [open, setOpen] = useState(false);
+  const current = LANGUAGES.find(l => l.code === language)!;
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen(prev => !prev)}
+        className="w-9 h-9 rounded-full border flex items-center justify-center text-lg transition-all hover:scale-110 hover:shadow-md"
+        style={{ borderColor: 'var(--color-border)' }}
+        title="Change language"
+      >
+        {current.flag}
+      </button>
+
+      {open && (
+        <>
+          {/* Backdrop */}
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+
+          {/* Dropdown */}
+          <div
+            className="absolute right-0 top-12 z-50 rounded-2xl border shadow-2xl overflow-hidden min-w-[160px] animate-fade-in"
+            style={{ backgroundColor: 'var(--color-bg-warm)', borderColor: 'var(--color-border)' }}
+          >
+            {LANGUAGES.map(lang => (
+              <button
+                key={lang.code}
+                onClick={() => { setLanguage(lang.code); setOpen(false); }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors hover:bg-amber-500/10 text-left"
+                style={{
+                  color: lang.code === language ? 'var(--color-accent)' : 'var(--color-text)',
+                  fontWeight: lang.code === language ? 700 : 500,
+                  borderLeft: lang.code === language ? '3px solid var(--color-accent)' : '3px solid transparent',
+                }}
+              >
+                <span className="text-xl">{lang.flag}</span>
+                <span>{lang.label}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 function AppContent() {
   const { theme, toggleTheme } = useTheme();
-
+  const { language } = useLanguage();
 
   return (
     <div
@@ -38,15 +89,18 @@ function AppContent() {
             Trumpet
           </Link>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-6 text-sm font-medium">
               <Link to="/music-paths" className="transition-colors no-underline hover:text-amber-600" style={{ color: 'var(--color-text-muted)' }}>
-                Music Paths
+                {tr(language, 'nav.musicPaths')}
               </Link>
               <Link to="/communities" className="transition-colors no-underline hover:text-amber-600" style={{ color: 'var(--color-text-muted)' }}>
-                Communities
+                {tr(language, 'nav.communities')}
               </Link>
             </div>
+
+            {/* Language Switcher */}
+            <LanguageSwitcher />
 
             {/* Theme Toggle */}
             <button
@@ -102,10 +156,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <ThemeProvider>
-        <AppContent />
+        <LanguageProvider>
+          <AppContent />
+        </LanguageProvider>
       </ThemeProvider>
     </BrowserRouter>
   );
 }
-
-
