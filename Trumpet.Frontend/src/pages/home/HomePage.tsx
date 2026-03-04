@@ -4,12 +4,15 @@ import MusicPathsGrid from "../../components/MusicPathsGrid";
 import CommunityCarousel from "../../components/CommunityCarousel";
 import { useItems } from "../../hooks/useItems";
 import { getMediaUrl } from "../../api/config";
+import { useLanguage } from "../../hooks/useLanguage";
+import { tr } from "../../i18n/translations";
+import { getLocalizedTitle, getLocalizedContributor } from "../../i18n/localize";
 
 export default function HomePage() {
   const { items, loading } = useItems("", "");
+  const { language } = useLanguage();
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  // Track mouse for parallax effect
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({
@@ -47,8 +50,7 @@ export default function HomePage() {
         />
       </div>
 
-      {/* Hero Section with parallax */}
-      {/* Hero Section with parallax */}
+      {/* Hero Section */}
       <section className="text-center pt-8 pb-16 mb-8 relative px-4">
         <div
           className="transition-transform duration-300"
@@ -67,47 +69,38 @@ export default function HomePage() {
             className="text-base md:text-lg leading-relaxed mb-12 text-center text-balance"
             style={{ color: 'var(--color-text-muted)' }}
           >
-            The long-standing musical tradition of Corfu can be encoded in the framework of four distinct, but at the same time interconnected musical "paths", which through time sometimes converged and sometimes diverged, but always expressed the Corfiots’ musical instinct. These four musical paths are:
+            {tr(language, 'home.hero')}
           </p>
 
           <MusicPathsGrid />
         </div>
-
-
-
-
-
-
-
 
         {/* Floating music notes */}
         <div className="absolute top-1/4 left-10 text-4xl opacity-20 animate-bounce" style={{ animationDuration: '3s' }}>♪</div>
         <div className="absolute top-1/3 right-16 text-3xl opacity-20 animate-bounce" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }}>♫</div>
         <div className="absolute bottom-1/4 left-1/4 text-2xl opacity-20 animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}>♬</div>
       </section>
-      {/* Hero Search Bar */}
-
 
       {/* Communities */}
       <section className="mb-20">
         <CommunityCarousel />
       </section>
 
-      {/* Featured Items with hover magic */}
+      {/* Featured Items */}
       <section className="py-16 border-t relative" style={{ borderColor: 'var(--color-border)' }}>
         <div className="mb-10 flex items-end justify-between">
           <div>
-            <h2 className="section-title">From the Archive</h2>
-            <p className="section-subtitle">Recently added treasures from our collections</p>
+            <h2 className="section-title">{tr(language, 'home.fromArchive')}</h2>
+            <p className="section-subtitle">{tr(language, 'home.recentlyAdded')}</p>
           </div>
-          <Link to="/items" className="link-arrow text-sm">Browse all</Link>
+          <Link to="/items" className="link-arrow text-sm">{tr(language, 'home.browseAll')}</Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {loading ? (
             <div className="col-span-full py-16 text-center" style={{ color: 'var(--color-text-muted)' }}>
               <div className="inline-block w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-              <p className="mt-4">Loading archive...</p>
+              <p className="mt-4">{tr(language, 'home.loadingArchive')}</p>
             </div>
           ) : (
             items.slice(0, 4).map((item, i) => (
@@ -117,7 +110,6 @@ export default function HomePage() {
                 className="group relative card p-0 block no-underline overflow-hidden dark:bg-black"
                 style={{ animationDelay: `${i * 100}ms` }}
               >
-                {/* Glow effect on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-orange-500/0 group-hover:from-amber-500/10 group-hover:to-orange-500/10 transition-all duration-500" />
 
                 <div
@@ -129,8 +121,6 @@ export default function HomePage() {
                       (b.mimeType && b.mimeType.startsWith('image/')) ||
                       b.name.match(/\.(jpg|jpeg|png|gif)$/i)
                     ) || [];
-
-                    // Sort by size desc (prefer higher quality)
                     imageBitstreams.sort((a, b) => (b.sizeBytes || 0) - (a.sizeBytes || 0));
                     const cover = imageBitstreams.length > 0 ? imageBitstreams[0] : null;
                     const coverUrl = cover ? getMediaUrl(cover.localFilePath) : null;
@@ -165,10 +155,10 @@ export default function HomePage() {
                     className="font-semibold mb-1 line-clamp-2 group-hover:text-amber-600 transition-colors"
                     style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--color-text)' }}
                   >
-                    {item.name}
+                    {getLocalizedTitle(item, language)}
                   </h3>
                   <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                    {item.metadata.find(m => m.field === "dc.contributor.author")?.value || "Unknown"}
+                    {getLocalizedContributor(item, language) || tr(language, 'home.unknown')}
                   </p>
                 </div>
               </Link>
@@ -176,8 +166,6 @@ export default function HomePage() {
           )}
         </div>
       </section>
-    </div >
+    </div>
   );
 }
-
-

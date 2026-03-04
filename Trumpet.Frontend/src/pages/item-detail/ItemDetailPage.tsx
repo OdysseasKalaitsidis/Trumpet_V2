@@ -3,17 +3,21 @@ import { useParams, Link } from 'react-router-dom';
 import type { Bitstream, Item } from '../../models/domain';
 import { getMediaUrl } from '../../api/config';
 import { useItem } from '../../hooks/useItem';
-import { fetchRecommendations } from '../home/api';
+import { fetchRecommendations } from './api';
+import { useLanguage } from '../../hooks/useLanguage';
+import { tr } from '../../i18n/translations';
+import { getLocalizedTitle, getLocalizedDescription, getLocalizedContributor, getLocalizedMetadata } from '../../i18n/localize';
 
 import LeafletMap from '../../components/LeafletMap';
 
 export default function ItemDetail() {
     const { id } = useParams<{ id: string }>();
     const { item, loading } = useItem(id);
+    const { language } = useLanguage();
     const [selectedFile, setSelectedFile] = useState<Bitstream | null>(null);
     const [recommendations, setRecommendations] = useState<Item[]>([]);
     const [showMetadata, setShowMetadata] = useState(false);
-    
+
     useEffect(() => {
         if (id) {
             fetchRecommendations(id).then(setRecommendations).catch(console.error);
@@ -23,28 +27,9 @@ export default function ItemDetail() {
     if (loading) return <div className="container mt-5">Loading...</div>;
     if (!item) return <div className="container mt-5">Item not found.</div>;
 
-    const getMetadata = (field: string, langPrefix: string = 'en') => {
-        const englishValues = item.metadata
-            .filter(m => m.field === field && m.language?.startsWith(langPrefix))
-            .map(m => m.value);
-
-        if (englishValues.length > 0) return englishValues.join(', ');
-
-        return item.metadata.filter(m => m.field === field).map(m => m.value).join(', ');
-    };
-
-    const getContributors = () => {
-        const fields = ['dc.contributor.author', 'dc.creator', 'dc.contributor.other'];
-        const allMatches = item.metadata.filter(m => fields.includes(m.field));
-
-        const englishMatches = allMatches.filter(m => m.language?.startsWith('en'));
-        if (englishMatches.length > 0) {
-            return Array.from(new Set(englishMatches.map(m => m.value))).join('; ');
-        }
-
-        // Strict English only: return nothing if no English contributors found
-        return '';
-    };
+    // Shorthand helpers using shared localize utilities
+    const getMetadata = (field: string) => getLocalizedMetadata(item.metadata, field, language);
+    const getContributors = () => getLocalizedContributor(item, language);
 
     const latStr = item.metadata.find(m => m.field === 'dc.coverage.spatiallatitude')?.value;
     const lonStr = item.metadata.find(m => m.field === 'dc.coverage.spatiallongitude')?.value;
@@ -56,11 +41,8 @@ export default function ItemDetail() {
         (b.mimeType && b.mimeType.startsWith('image/')) ||
         b.name.match(/\.(jpg|jpeg|png|gif)$/i)
     );
-
     imageBitstreams.sort((a, b) => (b.sizeBytes || 0) - (a.sizeBytes || 0));
-
     const imageBitstream = imageBitstreams.length > 0 ? imageBitstreams[0] : undefined;
-
     const coverUrl = imageBitstream ? getMediaUrl(imageBitstream.localFilePath) : null;
 
     const audioExtensions = ['.mp3', '.wav', '.ogg', '.m4a', '.flac'];
@@ -78,18 +60,14 @@ export default function ItemDetail() {
     const mainMedia = audioFiles.length > 0 ? audioFiles[0] : (videoFiles.length > 0 ? videoFiles[0] : null);
     const mainMediaType = audioFiles.length > 0 ? 'audio' : 'video';
 
-    const openModal = (file: Bitstream) => {
-        setSelectedFile(file);
-    };
-    const closeModal = () => {
-        setSelectedFile(null);
-    };
+    const openModal = (file: Bitstream) => setSelectedFile(file);
+    const closeModal = () => setSelectedFile(null);
 
     return (
         <div className="py-12 animate-fade-in max-w-6xl mx-auto">
             <div className="mb-12">
                 <Link to="/" className="text-theme-text-muted hover:text-theme-text transition-colors font-medium flex items-center gap-2">
-                    <span className="text-xl">←</span> Back to Archive
+                    <span className="text-xl">←</span> {tr(language, 'item.backToArchive')}
                 </Link>
             </div>
 
@@ -102,7 +80,7 @@ export default function ItemDetail() {
                         ) : (
                             <div className="w-full h-auto aspect-square bg-gradient-to-br from-white/10 to-transparent flex flex-col items-center justify-center">
                                 <span className="text-8xl mb-4 group-hover:scale-110 transition-transform">🎵</span>
-                                <p className="text-theme-text-muted font-medium">Archival Asset</p>
+                                <p className="text-theme-text-muted font-medium">{tr(language, 'item.archivalAsset')}</p>
                             </div>
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
@@ -122,13 +100,13 @@ export default function ItemDetail() {
                             {getMetadata('dc.type') || 'Musical Item'}
                         </div>
                         <h1 className="text-5xl md:text-6xl font-black text-theme-text leading-tight tracking-tighter mb-6">
-                            {item.name}
+                            {getLocalizedTitle(item, language)}
                         </h1>
                         <p className="text-2xl text-theme-text-muted font-medium leading-relaxed">
-                            {getContributors() || 'Unknown Archivist'}
+                            {getContributors() || tr(language, 'item.unknownArchivist')}
                         </p>
-                        
-                        {/* Tags Display */}
+
+                        {/* Tags */}
                         <div className="flex flex-wrap gap-2 mt-6">
                             {item.metadata.filter(m => m.field === 'trumpet.tag').map((tag, idx) => (
                                 <span key={idx} className="px-3 py-1 rounded-lg bg-white/10 border border-white/10 text-xs font-bold text-white/80 uppercase tracking-wider">
@@ -145,7 +123,7 @@ export default function ItemDetail() {
                                     {mainMediaType === 'audio' ? '🔊' : '🎬'}
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-lg text-theme-text">Media Playback</h3>
+                                    <h3 className="font-bold text-lg text-theme-text">{tr(language, 'item.mediaPlayback')}</h3>
                                     <p className="text-theme-text-muted text-sm font-medium truncate max-w-xs">{mainMedia.name}</p>
                                 </div>
                             </div>
@@ -166,25 +144,27 @@ export default function ItemDetail() {
 
                     <div className="space-y-8">
                         <div>
-                            <h4 className="text-sm font-bold tracking-widest text-theme-text-light uppercase mb-4">Metadata Overview</h4>
+                            <h4 className="text-sm font-bold tracking-widest text-theme-text-light uppercase mb-4">{tr(language, 'item.metadataOverview')}</h4>
                             <div className="space-y-4">
                                 <div className="flex justify-between items-start py-4 border-b border-theme-border">
-                                    <span className="text-theme-text-muted font-medium">Music Path</span>
+                                    <span className="text-theme-text-muted font-medium">{tr(language, 'item.musicPath')}</span>
                                     <span className="text-theme-text font-bold">{getMetadata('dc.musicsubpath') || '-'}</span>
                                 </div>
                                 <div className="flex justify-between items-start py-4 border-b border-theme-border">
-                                    <span className="text-theme-text-muted font-medium">Date</span>
+                                    <span className="text-theme-text-muted font-medium">{tr(language, 'item.date')}</span>
                                     <span className="text-theme-text font-bold">{getMetadata('dc.date.issued') || '-'}</span>
                                 </div>
                                 <div className="flex flex-col gap-2 py-4">
-                                    <span className="text-theme-text-muted font-medium">Description</span>
-                                    <span className="text-theme-text text-sm leading-relaxed font-medium">{getMetadata('dc.description') || 'No description available for this archival item.'}</span>
+                                    <span className="text-theme-text-muted font-medium">{tr(language, 'item.description')}</span>
+                                    <span className="text-theme-text text-sm leading-relaxed font-medium">
+                                        {getLocalizedDescription(item, language) || tr(language, 'item.noDescription')}
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <h4 className="text-sm font-bold tracking-widest text-theme-text-light uppercase mb-6">Archive Files</h4>
+                            <h4 className="text-sm font-bold tracking-widest text-theme-text-light uppercase mb-6">{tr(language, 'item.archiveFiles')}</h4>
                             <div className="grid grid-cols-1 gap-3">
                                 {item.bitstreams.map(b => (
                                     <button
@@ -210,14 +190,12 @@ export default function ItemDetail() {
                 </div>
             </div>
 
-
-
             {/* Recommendations Section */}
             {recommendations.length > 0 && (
                 <div className="mt-32 border-t border-white/5 pt-16">
-                     <h2 className="text-3xl font-black text-white tracking-tighter mb-12 flex items-center gap-4">
+                    <h2 className="text-3xl font-black text-white tracking-tighter mb-12 flex items-center gap-4">
                         <span className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-sm">✨</span>
-                        You Might Also Like
+                        {tr(language, 'item.youMightAlsoLike')}
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {recommendations.map(rec => (
@@ -227,16 +205,15 @@ export default function ItemDetail() {
                                 className="group relative bg-white/5 border border-white/10 rounded-3xl overflow-hidden hover:bg-white/10 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full"
                             >
                                 <div className="aspect-[4/5] bg-white/5 flex items-center justify-center relative overflow-hidden">
-                                     <span className="text-4xl group-hover:scale-110 transition-transform duration-700">🎵</span>
-                                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    <span className="text-4xl group-hover:scale-110 transition-transform duration-700">🎵</span>
+                                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
-                                
                                 <div className="p-6 flex-grow flex flex-col justify-end">
-                                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-white transition-colors line-clamp-2 leading-tight">
-                                        {rec.name}
-                                    </h3>
+                                    <h3 className="text-lg font-bold text-white mb-1 line-clamp-2 leading-tight">{rec.name}</h3>
                                     <p className="text-white/40 text-xs font-medium">
-                                        {rec.metadata.find(m => m.field === "dc.contributor.author")?.value || "Unknown Archive"}
+                                        {rec.metadata.find(m => m.field === "dc.contributor.author" && m.language?.startsWith(language))?.value
+                                            || rec.metadata.find(m => m.field === "dc.contributor.author")?.value
+                                            || tr(language, 'item.unknownArchive')}
                                     </p>
                                 </div>
                             </Link>
@@ -245,38 +222,38 @@ export default function ItemDetail() {
                 </div>
             )}
 
-            {/* Expanded Metadata Table */}
-            <div className="mt-32 pt-16 border-t border-white/5">
+            {/* Extended Metadata Table */}
+            <div className="mt-32 pt-16 border-t border-theme-border">
                 <div className="flex items-center justify-between mb-12">
-                     <h2 className="text-3xl font-black text-white tracking-tighter flex items-center gap-4">
-                        <span className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-sm">📊</span>
-                        Extended Archival Record
-                     </h2>
-                    <button 
+                    <h2 className="text-3xl font-black text-theme-text tracking-tighter flex items-center gap-4">
+                        <span className="w-8 h-8 rounded-lg bg-theme-surface flex items-center justify-center text-sm">📊</span>
+                        {tr(language, 'item.extendedRecord')}
+                    </h2>
+                    <button
                         onClick={() => setShowMetadata(!showMetadata)}
-                        className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-sm tracking-wide hover:bg-white/10 transition-colors flex items-center gap-3"
+                        className="px-6 py-3 rounded-xl bg-theme-surface border border-theme-border text-theme-text font-bold text-sm tracking-wide hover:bg-theme-bg-muted transition-colors flex items-center gap-3"
                     >
-                        {showMetadata ? 'Hide Metadata' : 'View Full Record'}
+                        {showMetadata ? tr(language, 'item.hideMetadata') : tr(language, 'item.viewFullRecord')}
                         <span className={`transform transition-transform duration-300 ${showMetadata ? 'rotate-180' : ''}`}>▼</span>
                     </button>
                 </div>
-                
+
                 {showMetadata && (
-                    <div className="rounded-[2.5rem] overflow-hidden bg-white/[0.02] border border-white/5 backdrop-blur-3xl shadow-3xl animate-fade-in">
+                    <div className="rounded-[2.5rem] overflow-hidden bg-theme-surface border border-theme-border backdrop-blur-3xl shadow-3xl animate-fade-in">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-white/5">
-                                    <th className="p-8 text-xs font-black tracking-widest text-white/30 uppercase">Archival Field</th>
-                                    <th className="p-8 text-xs font-black tracking-widest text-white/30 uppercase">Record Value</th>
-                                    <th className="p-8 text-xs font-black tracking-widest text-white/30 uppercase w-32">Index</th>
+                                <tr className="border-b border-theme-border">
+                                    <th className="p-8 text-xs font-black tracking-widest text-theme-text-light uppercase">{tr(language, 'item.archivalField')}</th>
+                                    <th className="p-8 text-xs font-black tracking-widest text-theme-text-light uppercase">{tr(language, 'item.recordValue')}</th>
+                                    <th className="p-8 text-xs font-black tracking-widest text-theme-text-light uppercase w-32">{tr(language, 'item.index')}</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/[0.02]">
+                            <tbody className="divide-y divide-theme-border">
                                 {item.metadata.map((m, idx) => (
-                                    <tr key={idx} className="hover:bg-white/[0.03] transition-colors group">
-                                        <td className="p-8 font-mono text-xs text-white/20 group-hover:text-white/60 transition-colors uppercase tracking-tight">{m.field}</td>
-                                        <td className="p-8 text-sm font-bold text-white/80 leading-relaxed max-w-2xl">{m.value}</td>
-                                        <td className="p-8 text-xs font-black text-white/10">{m.language || 'LOC'}</td>
+                                    <tr key={idx} className="hover:bg-theme-bg-muted transition-colors group">
+                                        <td className="p-8 font-mono text-xs text-theme-text-light group-hover:text-theme-text-muted transition-colors uppercase tracking-tight">{m.field}</td>
+                                        <td className="p-8 text-sm font-bold text-theme-text leading-relaxed max-w-2xl">{m.value}</td>
+                                        <td className="p-8 text-xs font-black text-theme-text-light">{m.language || 'LOC'}</td>
                                     </tr>
                                 ))}
                             </tbody>

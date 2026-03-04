@@ -169,19 +169,6 @@ export default function CommunityCarousel() {
           </div>
         </div>
       </div>
-
-<<<<<<< HEAD
-      <div className="relative overflow-hidden">
-        <div 
-          className="flex gap-6 transition-transform duration-700 ease-out py-4"
-          style={{ transform: `translateX(-${scrollPos}px)` }}
-        >
-          {communities.map((c) => (
-            <Link
-              key={c.id}
-              to={`/browse?communityId=${c.id}`}
-              className="flex-shrink-0 w-80 p-8 rounded-[2rem] bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-300 group"
-=======
       <div className={`grid grid-cols-1 md:grid-cols-3 gap-5 transition-all duration-300 ${isTransitioning ? 'opacity-0 translate-x-4' : 'opacity-100 translate-x-0'}`}>
         {visibleCommunities.map((c, i) => (
           <Link
@@ -205,7 +192,6 @@ export default function CommunityCarousel() {
             <div
               className="absolute top-4 right-4 text-4xl opacity-10 group-hover:opacity-30 group-hover:scale-110 transition-all duration-500"
               style={{ animation: 'float 3s ease-in-out infinite', animationDelay: `${i * 200}ms` }}
->>>>>>> 5dd90944b3a00ebaa33fd1a726e1e8cb20bf0166
             >
               🎵
             </div>

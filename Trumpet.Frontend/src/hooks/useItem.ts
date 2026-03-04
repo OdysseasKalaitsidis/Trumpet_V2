@@ -3,26 +3,28 @@ import type { Item } from "../models/domain";
 import { fetchItem } from "../pages/item-detail/api";
 
 export function useItem(id: string | undefined) {
-  const [item, setItem] = useState<Item | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+       const [item, setItem] = useState<Item | null>(null);
+       const [loading, setLoading] = useState(false);
+       const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    if (!id) {
-      setLoading(false);
-      return;
-    }
+       useEffect(() => {
+              if (!id) return;
 
-    setLoading(true);
-    setError(null);
-    fetchItem(id)
-      .then(setItem)
-      .catch((err) => {
-        setError(err instanceof Error ? err : new Error("Failed to fetch item"));
-        console.error(err);
-      })
-      .finally(() => setLoading(false));
-  }, [id]);
+              const load = async () => {
+                     setLoading(true);
+                     setError(null);
+                     try {
+                            const data = await fetchItem(id);
+                            setItem(data);
+                     } catch (err) {
+                            setError(err instanceof Error ? err : new Error("Failed to fetch item"));
+                     } finally {
+                            setLoading(false);
+                     }
+              };
 
-  return { item, loading, error };
+              load();
+       }, [id]);
+
+       return { item, loading, error };
 }
