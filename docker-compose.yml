@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./Trumpet.Backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      # Override CORS origins — set to your frontend URL in production
+      # - AllowedOrigins__0=https://your-frontend-domain.com
+    volumes:
+      - ./data/database/trumpet.db:/data/trumpet.db
+      - ./data/raw:/data/raw:ro
+      - ./resources:/media:ro
+
+  frontend:
+    build:
+      context: ./Trumpet.Frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=http://localhost:8080
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
