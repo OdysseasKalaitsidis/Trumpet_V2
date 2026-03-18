@@ -15,7 +15,6 @@ export default function CommunitiesPage() {
   const [manifestFiles, setManifestFiles] = useState<string[]>([]);
 
   useEffect(() => {
-    // Fetch manifest
     fetch('/media/manifest.json')
       .then(res => res.json())
       .then(data => setManifestFiles(data.files || []))
@@ -44,163 +43,103 @@ export default function CommunitiesPage() {
   );
 
   return (
-    <div className="animate-fade-in relative">
-      {/* Floating background decorations */}
-      <div className="absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-full blur-3xl" />
-      <div className="absolute top-1/2 -left-32 w-48 h-48 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-3xl" />
-
+    <div className="animate-fade-in py-16 px-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="mb-12 relative z-10">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 mb-6 text-sm font-medium transition-all hover:gap-3"
-          style={{ color: 'var(--color-accent)' }}
-        >
-          {tr(language, 'communities.backToHome')}
-        </Link>
-
-        <h1
-          className="text-4xl md:text-5xl font-bold mb-4"
-          style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--color-text)' }}
-        >
-          {getPathTitle(path, language)}
-        </h1>
-        <p className="text-lg max-w-2xl" style={{ color: 'var(--color-text-muted)' }}>
-          {tr(language, 'communities.subtitle')}
-        </p>
-
-        {/* Search bar */}
-        <div className="mt-8 max-w-md">
-          <div
-            className="relative flex items-center rounded-xl border overflow-hidden transition-all focus-within:ring-2 focus-within:ring-amber-500/50"
-            style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg-warm)' }}
-          >
-            <span className="pl-4 opacity-50">🔍</span>
-            <input
-              type="text"
-              placeholder={tr(language, 'communities.searchPlaceholder')}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-3 bg-transparent border-none outline-none"
-              style={{ color: 'var(--color-text)' }}
-            />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm('')}
-                className="px-4 opacity-50 hover:opacity-100 transition-opacity"
-              >
-                ✕
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="mt-6 flex gap-6">
-          <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            <span className="font-bold text-lg" style={{ color: 'var(--color-text)' }}>{communities.length}</span> communities
-          </div>
-          {searchTerm && (
-            <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-              <span className="font-bold text-lg text-amber-500">{filteredCommunities.length}</span> results
+      <header className="mb-24">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-12">
+            <div className="max-w-2xl">
+                <nav className="mb-10">
+                    <Link
+                        to="/"
+                        className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 hover:text-orange-600 transition-colors"
+                    >
+                        {tr(language, 'communities.backToHome')}
+                    </Link>
+                </nav>
+                <h1 className="text-5xl md:text-8xl font-bold mb-8 tracking-tighter dark:text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    {getPathTitle(path, language)}
+                </h1>
+                <p className="text-xl text-zinc-400 font-bold uppercase tracking-[0.2em] leading-relaxed">
+                    {tr(language, 'communities.subtitle')}
+                </p>
             </div>
-          )}
+            
+            {/* Minimalist Search */}
+            <div className="w-full md:w-96">
+                <div className="relative group">
+                    <input
+                        type="text"
+                        placeholder={tr(language, 'communities.searchPlaceholder')}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full px-8 py-5 glass-card bg-white/20 dark:bg-zinc-900/20 rounded-full focus:outline-none focus:ring-1 focus:ring-orange-500/30 transition-all font-bold text-xs uppercase tracking-widest text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-300"
+                    />
+                    <div className="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-400">
+                        {searchTerm ? (
+                            <button onClick={() => setSearchTerm('')} className="hover:text-orange-600 transition-colors text-lg">✕</button>
+                        ) : (
+                            <span className="text-xl opacity-30">🔍</span>
+                        )}
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+      </header>
 
-      {/* Communities Grid */}
+      {/* Grid */}
       {loading ? (
-        <div className="col-span-full py-16 text-center" style={{ color: 'var(--color-text-muted)' }}>
-          <div className="inline-block w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-          <p className="mt-4">{tr(language, 'communities.loading')}</p>
+        <div className="py-32 flex justify-center">
+          <div className="w-12 h-12 border-2 border-orange-600 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : filteredCommunities.length === 0 ? (
-        <div className="py-16 text-center" style={{ color: 'var(--color-text-muted)' }}>
-          <div className="text-6xl mb-4 opacity-30">🔍</div>
-          <p className="text-xl">{tr(language, 'communities.noResults')} "{searchTerm}"</p>
+        <div className="py-32 text-center">
+          <p className="text-2xl text-zinc-400 font-black uppercase tracking-tighter">{tr(language, 'communities.noResults')} "{searchTerm}"</p>
           <button
             onClick={() => setSearchTerm('')}
-            className="mt-4 px-6 py-2 rounded-lg font-medium"
-            style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}
+            className="mt-8 text-orange-600 font-black uppercase tracking-widest border-b-2 border-orange-600/30 pb-1"
           >
             {tr(language, 'communities.clearSearch')}
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCommunities.map((comm, i) => (
-            <Link
-              key={comm.id}
-              to={`/items?communityId=${comm.id}&pathName=${getPathTitle(path)}&communityName=${encodeURIComponent(comm.name)}`}
-              className="group relative p-6 rounded-2xl border overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 no-underline bg-[var(--color-bg-warm)] dark:bg-black"
-              style={{
-                borderColor: 'var(--color-border)',
-                animation: `slideIn 0.5s ease-out ${i * 50}ms backwards`
-              }}
-            >
-              {/* Gradient overlay on hover */}
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-orange-500/0 group-hover:from-amber-500/5 group-hover:to-orange-500/10 transition-all duration-500" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          {filteredCommunities.map((comm, i) => {
+            const logoFile = manifestFiles.find(f => f.includes(comm.id));
+            return (
+                <Link
+                key={comm.id}
+                to={`/items?communityId=${comm.id}&pathName=${getPathTitle(path)}&communityName=${encodeURIComponent(comm.name)}`}
+                className="group glass-card p-12 flex flex-col rounded-[3rem] no-underline"
+                style={{ animationDelay: `${i * 50}ms` }}
+                >
+                <div className="flex justify-between items-start mb-10">
+                    <div className="w-12 h-1 rounded-full bg-orange-600 group-hover:w-20 transition-all duration-700" />
+                    {logoFile && (
+                        <img 
+                            src={`/media/${logoFile}`} 
+                            alt={comm.name} 
+                            className="w-16 h-16 object-contain rounded-2xl bg-white/20 dark:bg-zinc-800/20 backdrop-blur-md p-3 shadow-sm opacity-50 group-hover:opacity-100 transition-all duration-700 hover:scale-110" 
+                        />
+                    )}
+                </div>
 
-              {/* Community Logo */}
-              {(() => {
-                const logoFile = manifestFiles.find(f => f.includes(comm.id));
-                return logoFile ? (
-                  <img
-                    src={`/media/${logoFile}`}
-                    alt={`${comm.name} logo`}
-                    className="absolute top-4 right-4 w-16 h-16 object-contain opacity-20 group-hover:opacity-100 transition-all duration-500 rounded-full bg-white/10 p-1"
-                  />
-                ) : (
-                  <div
-                    className="absolute top-4 right-4 text-3xl opacity-10 group-hover:opacity-30 transition-opacity"
-                    style={{ animation: 'float 3s ease-in-out infinite' }}
-                  >
-                    🎵
-                  </div>
-                );
-              })()}
+                <h3 className="text-3xl font-bold mb-6 dark:text-white group-hover:text-orange-600 transition-colors uppercase tracking-tighter leading-tight">
+                    {comm.name}
+                </h3>
 
-              {/* Accent bar */}
-              <div className="w-10 h-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 mb-5 group-hover:w-16 transition-all duration-500" />
+                <p className="text-zinc-400 dark:text-zinc-500 text-sm leading-relaxed mb-10 line-clamp-3 font-medium">
+                    {comm.introductoryText || tr(language, 'communities.fallbackDescription')}
+                </p>
 
-              <h3
-                className="text-xl font-bold mb-3 line-clamp-2 group-hover:text-amber-600 transition-colors relative z-10"
-                style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--color-text)' }}
-              >
-                {comm.name}
-              </h3>
-
-              <p
-                className="text-sm line-clamp-3 mb-6"
-                style={{ color: 'var(--color-text-muted)' }}
-              >
-                {comm.introductoryText || tr(language, 'communities.fallbackDescription')}
-              </p>
-
-              {/* Explore button */}
-              <div className="flex items-center gap-2 text-amber-500 font-semibold opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
-                <span>{tr(language, 'communities.exploreCollection')}</span>
-                <span className="group-hover:translate-x-2 transition-transform">→</span>
-              </div>
-
-              {/* Corner glow */}
-              <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-500 rounded-full opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
-            </Link>
-          ))}
+                <div className="mt-auto flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-orange-600 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                    <span>{tr(language, 'communities.exploreCollection')}</span>
+                    <span className="text-lg">→</span>
+                </div>
+                </Link>
+            );
+          })}
         </div>
       )}
-
-      {/* Keyframes */}
-      <style>{`
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-8px) rotate(5deg); }
-        }
-      `}</style>
     </div>
   );
 }

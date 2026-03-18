@@ -6,7 +6,6 @@ import { getMediaUrl } from "../../api/config";
 import { useLanguage } from "../../hooks/useLanguage";
 import { getLocalizedTitle, getLocalizedContributor } from "../../i18n/localize";
 import { tr } from "../../i18n/translations";
-
 import { useState, useEffect } from 'react';
 
 export default function ItemsPage() {
@@ -23,7 +22,6 @@ export default function ItemsPage() {
   const [logoFile, setLogoFile] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch manifest
     fetch('/media/manifest.json')
       .then(res => res.json())
       .then(data => setManifestFiles(data.files || []))
@@ -46,166 +44,116 @@ export default function ItemsPage() {
     : getPageDescription({ search, communityName, pathName });
 
   return (
-    <div className="animate-fade-in relative">
-      {/* Background decoration */}
-      <div className="absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="animate-fade-in py-16 px-6 max-w-7xl mx-auto">
+      {/* Breadcrumb / Nav */}
+      <nav className="mb-12 flex items-center justify-between">
+        <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">
+            <Link to="/" className="hover:text-orange-600 transition-colors">Home</Link>
+            <span className="opacity-30">/</span>
+            {search ? (
+                <span className="text-zinc-900 dark:text-white">Search Results</span>
+            ) : (
+                <span className="text-zinc-900 dark:text-white">{communityName || pathName}</span>
+            )}
+        </div>
 
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm mb-6 relative z-10" style={{ color: 'var(--color-text-muted)' }}>
-        <Link to="/" className="hover:underline" style={{ color: 'var(--color-accent)' }}>Home</Link>
-        <span>/</span>
-        {search ? (
-          <span>Search Results</span>
-        ) : (
-          <span>{communityName || pathName}</span>
+        {!loading && (
+            <div className="text-[10px] font-black uppercase tracking-widest px-4 py-1.5 glass-card bg-orange-600/10 text-orange-600 rounded-full">
+                {items.length} Archival Items
+            </div>
         )}
       </nav>
 
       {/* Header */}
-      <div className="mb-12 relative z-10">
-        <h1
-          className="text-3xl md:text-4xl font-bold mb-3 flex items-center gap-4"
-          style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--color-text)' }}
-        >
-          {logoFile && (
-            <img
-              src={`/media/${logoFile}`}
-              alt={`${communityName} logo`}
-              className="w-16 h-16 object-contain rounded-full bg-white/10 p-1"
-            />
-          )}
-          {pageTitle}
-        </h1>
-        <p style={{ color: 'var(--color-text-muted)' }}>
-          {pageDescription}
+      <header className="mb-24">
+        <div className="flex items-center gap-10 mb-8">
+            {logoFile && (
+                <img
+                src={`/media/${logoFile}`}
+                alt={`${communityName} logo`}
+                className="w-24 h-24 object-contain rounded-[2.5rem] glass-card p-4 shadow-sm"
+                />
+            )}
+            <h1 
+                className="text-5xl md:text-8xl font-bold tracking-tighter text-zinc-900 dark:text-white"
+                style={{ fontFamily: "'Playfair Display', serif" }}
+            >
+                {pageTitle}
+            </h1>
+        </div>
+        <p className="text-xl text-zinc-400 font-bold uppercase tracking-[0.2em] max-w-3xl leading-relaxed">
+            {pageDescription}
         </p>
+      </header>
 
-        {/* Results count */}
-        {!loading && (
-          <div className="mt-4 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            <span className="font-bold text-lg" style={{ color: 'var(--color-text)' }}>{items.length}</span> items found
-          </div>
-        )}
-      </div>
-
-      {/* Items Grid */}
+      {/* Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
             <div
               key={i}
-              className="h-64 rounded-2xl animate-pulse"
-              style={{ backgroundColor: 'var(--color-bg-muted)' }}
+              className="aspect-[4/5] rounded-[3rem] animate-pulse bg-zinc-50 dark:bg-zinc-950"
             />
           ))}
         </div>
       ) : items.length === 0 ? (
-        <div className="py-16 text-center" style={{ color: 'var(--color-text-muted)' }}>
-          <div className="text-6xl mb-4 opacity-30">🎵</div>
-          <p className="text-xl mb-2">No items found</p>
-          <p className="text-sm">
-            {search
-              ? `Try a different search term or browse our collections.`
-              : `This collection appears to be empty.`}
-          </p>
-          <Link
-            to="/"
-            className="inline-block mt-6 px-6 py-2 rounded-lg font-medium"
-            style={{ backgroundColor: 'var(--color-accent)', color: 'white' }}
-          >
-            Back to Home
-          </Link>
+        <div className="py-32 text-center">
+            <div className="text-8xl mb-12 opacity-10 animate-float">🎺</div>
+            <p className="text-3xl text-zinc-400 font-black mb-12 uppercase tracking-tighter">Silence in this collection.</p>
+            <Link
+                to="/"
+                className="inline-flex px-10 py-5 bg-zinc-900 dark:bg-white text-white dark:text-black rounded-full font-black text-[10px] tracking-[0.3em] uppercase hover:scale-105 transition-transform"
+            >
+                Back to Home
+            </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {items.map((item, i) => (
-            <Link
-              key={item.id}
-              to={`/item/${item.id}`}
-              className="group relative rounded-2xl border overflow-hidden no-underline transition-all duration-500 hover:shadow-2xl hover:-translate-y-2"
-              style={{
-                borderColor: 'var(--color-border)',
-                backgroundColor: 'var(--color-bg-warm)',
-                animation: `slideIn 0.4s ease-out ${i * 30}ms backwards`
-              }}
-            >
-              {/* Hover gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-orange-500/0 group-hover:from-amber-500/5 group-hover:to-orange-500/10 transition-all duration-500" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          {items.map((item, i) => {
+            const imageBitstreams = item.bitstreams?.filter(b =>
+                (b.mimeType && b.mimeType.startsWith('image/')) ||
+                b.name.match(/\.(jpg|jpeg|png|gif)$/i)
+            ) || [];
+            imageBitstreams.sort((a, b) => (b.sizeBytes || 0) - (a.sizeBytes || 0));
+            const cover = imageBitstreams.length > 0 ? imageBitstreams[0] : null;
+            const coverUrl = cover ? getMediaUrl(cover.localFilePath) : null;
 
-              {/* Image with Cover Logic */}
-              <div
-                className="w-full aspect-square flex items-center justify-center relative overflow-hidden"
-                style={{ backgroundColor: 'var(--color-bg-muted)' }}
-              >
-                {(() => {
-                  const imageBitstreams = item.bitstreams?.filter(b =>
-                    (b.mimeType && b.mimeType.startsWith('image/')) ||
-                    b.name.match(/\.(jpg|jpeg|png|gif)$/i)
-                  ) || [];
-
-                  // Sort by size desc (prefer higher quality)
-                  imageBitstreams.sort((a, b) => (b.sizeBytes || 0) - (a.sizeBytes || 0));
-                  const cover = imageBitstreams.length > 0 ? imageBitstreams[0] : null;
-                  const coverUrl = cover ? getMediaUrl(cover.localFilePath) : null;
-
-                  if (coverUrl) {
-                    return (
-                      <img
+            return (
+                <Link
+                key={item.id}
+                to={`/item/${item.id}`}
+                className="group glass-card flex flex-col h-full rounded-[3rem] overflow-hidden no-underline"
+                style={{ animationDelay: `${i * 30}ms` }}
+                >
+                <div className="aspect-[4/5] bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center relative overflow-hidden">
+                    {coverUrl ? (
+                        <img
                         src={coverUrl}
                         alt={item.name}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      />
-                    );
-                  }
-
-                  return (
-                    <div className="relative">
-                      <svg
-                        className="w-14 h-14 opacity-20 group-hover:opacity-40 group-hover:scale-110 transition-all duration-500"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-                      </svg>
-                      <div className="absolute inset-0 rounded-full border-2 border-amber-500/0 group-hover:border-amber-500/30 scale-100 group-hover:scale-150 opacity-0 group-hover:opacity-100 transition-all duration-700" />
-                    </div>
-                  );
-                })()}
-              </div>
-
-              {/* Content */}
-              <div className="p-4 relative z-10">
-                <h3
-                  className="font-semibold mb-1 line-clamp-2 group-hover:text-amber-600 transition-colors"
-                  style={{ color: 'var(--color-text)' }}
-                >
-                  {getLocalizedTitle(item, language)}
-                </h3>
-                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                  {getLocalizedContributor(item, language) || 'Unknown'}
-                </p>
-
-                {/* View arrow */}
-                <div className="mt-2 flex items-center gap-1 text-amber-500 text-sm font-medium opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
-                  <span>View</span>
-                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                        />
+                    ) : (
+                        <span className="text-5xl opacity-10 group-hover:scale-110 group-hover:opacity-40 transition-all duration-700">📜</span>
+                    )}
                 </div>
-              </div>
 
-              {/* Corner glow */}
-              <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-500 rounded-full opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
-            </Link>
-          ))}
+                <div className="p-10 flex flex-col h-full">
+                    <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-3 line-clamp-2 leading-tight group-hover:text-orange-600 transition-colors uppercase tracking-tighter">
+                        {getLocalizedTitle(item, language)}
+                    </h3>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                        {getLocalizedContributor(item, language) || 'Unknown Author'}
+                    </p>
+                    
+                    <div className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-orange-600 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+                        Explore <span className="text-lg">→</span>
+                    </div>
+                </div>
+                </Link>
+            );
+          })}
         </div>
       )}
-
-      {/* Keyframes */}
-      <style>{`
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }

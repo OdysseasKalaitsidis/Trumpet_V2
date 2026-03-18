@@ -165,6 +165,26 @@
     background-color: var(--color-text-light);
   }
 
+  /* Ultra-Minimalist Glassmorphism Utilities */
+  .glass-card {
+    @apply bg-white/40 dark:bg-zinc-900/40 backdrop-blur-xl border border-white/40 dark:border-zinc-800/40 transition-all duration-500;
+  }
+
+  .glass-card:hover {
+    @apply bg-white/60 dark:bg-zinc-900/60 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)];
+    transform: translateY(-4px);
+  }
+
+  .floating-navbar {
+    @apply fixed top-6 left-1/2 -translate-x-1/2 z-[100] px-8 py-3 rounded-full glass-card max-w-fit shadow-lg transition-all duration-500;
+  }
+
+  .soft-gradient-bg {
+    @apply fixed inset-0 -z-10 pointer-events-none;
+    background: radial-gradient(circle at 0% 0%, rgba(255, 237, 213, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(255, 237, 213, 0.3) 0%, transparent 40%);
+  }
+
   /* Animations */
   @keyframes fadeIn {
     from {
@@ -188,11 +208,20 @@
     }
   }
 
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
   .animate-fade-in {
-    animation: fadeIn 0.6s ease-out forwards;
+    animation: fadeIn 0.8s ease-out forwards;
   }
 
   .animate-slide-up {
-    animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: slideUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
 }

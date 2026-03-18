@@ -3,6 +3,7 @@ import type { Language } from '../hooks/useLanguage';
 type TranslationKey =
        | 'nav.musicPaths'
        | 'nav.communities'
+       | 'nav.events'
        | 'home.hero'
        | 'home.fromArchive'
        | 'home.browseAll'
@@ -52,7 +53,10 @@ type TranslationKey =
        | 'item.recordValue'
        | 'item.index'
        | 'item.unknownArchivist'
-       | 'item.unknownArchive';
+       | 'item.unknownArchive'
+       | 'events.title'
+       | 'events.subtitle'
+       | 'events.loading';
 
 type Translations = Record<TranslationKey, string>;
 
@@ -60,6 +64,7 @@ const t: Record<Language, Translations> = {
        en: {
               'nav.musicPaths': 'Music Paths',
               'nav.communities': 'Communities',
+              'nav.events': 'Events',
               'home.hero': "The long-standing musical tradition of Corfu can be encoded in the framework of four distinct, but at the same time interconnected musical \"paths\", which through time sometimes converged and sometimes diverged, but always expressed the Corfiots' musical instinct. These four musical paths are:",
               'home.fromArchive': 'From the Archive',
               'home.browseAll': 'Browse all',
@@ -110,10 +115,14 @@ const t: Record<Language, Translations> = {
               'item.index': 'Index',
               'item.unknownArchivist': 'Unknown Archivist',
               'item.unknownArchive': 'Unknown Archive',
+              'events.title': 'Corfu Events',
+              'events.subtitle': 'Discover upcoming musical performances, festivals and cultural events in Corfu.',
+              'events.loading': 'Finding events...',
        },
        fr: {
               'nav.musicPaths': 'Chemins musicaux',
               'nav.communities': 'Communautés',
+              'nav.events': 'Événements',
               'home.hero': "La longue tradition musicale de Corfou peut être encodée dans le cadre de quatre « chemins » musicaux distincts mais interconnectés, qui tantôt convergeaient, tantôt divergeaient, exprimant toujours l'instinct musical des Corfiotes. Ces quatre chemins musicaux sont :",
               'home.fromArchive': "De l'Archive",
               'home.browseAll': 'Tout parcourir',
@@ -164,10 +173,14 @@ const t: Record<Language, Translations> = {
               'item.index': 'Index',
               'item.unknownArchivist': 'Archiviste inconnu',
               'item.unknownArchive': 'Archive inconnue',
+              'events.title': 'Événements à Corfou',
+              'events.subtitle': 'Découvrez les représentations musicales, festivals et événements culturels à venir à Corfou.',
+              'events.loading': 'Recherche d\'événements...',
        },
        de: {
               'nav.musicPaths': 'Musikpfade',
               'nav.communities': 'Gemeinschaften',
+              'nav.events': 'Veranstaltungen',
               'home.hero': 'Die langjährige Musiktradition Korfus lässt sich in vier eigenständige, aber gleichzeitig miteinander verbundene musikalische „Pfade" einordnen, die im Laufe der Zeit manchmal konvergierten und manchmal divergierten, aber immer den musikalischen Instinkt der Korfioten ausdrückten. Diese vier Musikpfade sind:',
               'home.fromArchive': 'Aus dem Archiv',
               'home.browseAll': 'Alle durchsuchen',
@@ -218,11 +231,15 @@ const t: Record<Language, Translations> = {
               'item.index': 'Index',
               'item.unknownArchivist': 'Unbekannter Archivar',
               'item.unknownArchive': 'Unbekanntes Archiv',
+              'events.title': 'Veranstaltungen in Korfu',
+              'events.subtitle': 'Entdecken Sie bevorstehende Musikaufführungen, Festivals und kulturelle Veranstaltungen in Korfu.',
+              'events.loading': 'Veranstaltungen werden gesucht...',
        },
        it: {
               'nav.musicPaths': 'Percorsi musicali',
               'nav.communities': 'Comunità',
-              'home.hero': "La lunga tradizione musicale di Corfù può essere codificata nel quadro di quattro \"percorsi\" musicali distinti ma interconnessi, che nel tempo a volte convergevano e a volte divergevano, ma esprimevano sempre l'istinto musicale dei corfioti. Questi quattro percorsi musicali sono:",
+              'nav.events': 'Eventi',
+              'home.hero': "La lunga tradizione musicale di Corfù può essere codificata nel quadro di quattro \"percorsi\" musicali distinti ma interconnessi, che nel tempo a volte convergevano e a volte divergevano, ma esprimevano sempre l'instinto musicale dei corfioti. Questi quattro percorsi musicali sono:",
               'home.fromArchive': "Dall'Archivio",
               'home.browseAll': 'Sfoglia tutto',
               'home.recentlyAdded': 'Tesori aggiunti di recente dalle nostre collezioni',
@@ -272,10 +289,14 @@ const t: Record<Language, Translations> = {
               'item.index': 'Indice',
               'item.unknownArchivist': 'Archivista sconosciuto',
               'item.unknownArchive': 'Archivio sconosciuto',
+              'events.title': 'Eventi a Corfù',
+              'events.subtitle': 'Scopri i prossimi spettacoli musicali, festival ed eventi culturali a Corfù.',
+              'events.loading': 'Ricerca eventi...',
        },
        el: {
               'nav.musicPaths': 'Μουσικά Μονοπάτια',
               'nav.communities': 'Κοινότητες',
+              'nav.events': 'Εκδηλώσεις',
               'home.hero': 'Η μακραίωνη μουσική παράδοση της Κέρκυρας μπορεί να κωδικοποιηθεί στο πλαίσιο τεσσάρων διακριτών, αλλά ταυτόχρονα διασυνδεδεμένων μουσικών «μονοπατιών», τα οποία στο διάβα του χρόνου άλλοτε συγκλίνουν και άλλοτε αποκλίνουν, εκφράζοντας πάντα το μουσικό ένστικτο των Κερκυραίων. Αυτά τα τέσσερα μουσικά μονοπάτια είναι:',
               'home.fromArchive': 'Από το Αρχείο',
               'home.browseAll': 'Περιήγηση όλων',
@@ -326,6 +347,9 @@ const t: Record<Language, Translations> = {
               'item.index': 'Δείκτης',
               'item.unknownArchivist': 'Άγνωστος Αρχειονόμος',
               'item.unknownArchive': 'Άγνωστο Αρχείο',
+              'events.title': 'Εκδηλώσεις στην Κέρκυρα',
+              'events.subtitle': 'Ανακαλύψτε επερχόμενες μουσικές παραστάσεις, φεστιβάλ και πολιτιστικές εκδηλώσεις στην Κέρκυρα.',
+              'events.loading': 'Αναζήτηση εκδηλώσεων...',
        },
 };
 

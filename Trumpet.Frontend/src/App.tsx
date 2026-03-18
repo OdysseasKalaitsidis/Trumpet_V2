@@ -6,6 +6,7 @@ import SearchBox from "./components/SearchBox";
 import CommunitiesPage from "./pages/communities/CommunitiesPage";
 import MusicPathsPage from "./pages/music-paths/MusicPathsPage";
 import ItemsPage from "./pages/items/ItemsPage";
+import EventsPage from "./pages/events/EventsPage";
 import { ThemeProvider, useTheme } from "./hooks/useTheme";
 import { LanguageProvider, useLanguage, LANGUAGES } from "./hooks/useLanguage";
 import { tr } from "./i18n/translations";
@@ -63,50 +64,45 @@ function AppContent() {
   const { language } = useLanguage();
 
   return (
-    <div
-      className="flex flex-col min-h-screen transition-colors duration-300"
-      style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}
-    >
-      {/* Header */}
-      <header
-        className="sticky top-0 z-50 border-b backdrop-blur-md"
-        style={{
-          borderColor: 'var(--color-border)',
-          backgroundColor: theme === 'dark' ? 'rgba(10,10,10,0.9)' : 'rgba(253,251,247,0.9)'
-        }}
-      >
-        <nav className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <div className="flex flex-col min-h-screen transition-colors duration-500 overflow-x-hidden">
+      {/* Soft Ethereal Background */}
+      <div className="soft-gradient-bg" />
+
+      {/* Floating Glass Navbar */}
+      <header className="floating-navbar w-[calc(100%-3rem)] md:w-max">
+        <nav className="flex items-center gap-8 md:gap-12">
           <Link
-            className="text-xl font-semibold tracking-tight no-underline flex items-center gap-2"
+            className="flex items-center gap-2 group no-underline"
             to="/"
-            style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--color-text)' }}
           >
-            <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+            <div className="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500">
+               <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
               </svg>
+            </div>
+            <span className="hidden sm:block font-bold tracking-tighter text-zinc-900 dark:text-white uppercase transition-colors group-hover:text-orange-600">
+              Trumpet
             </span>
-            Trumpet
           </Link>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-6 text-sm font-medium">
-              <Link to="/music-paths" className="transition-colors no-underline hover:text-amber-600" style={{ color: 'var(--color-text-muted)' }}>
-                {tr(language, 'nav.musicPaths')}
-              </Link>
-              <Link to="/communities" className="transition-colors no-underline hover:text-amber-600" style={{ color: 'var(--color-text-muted)' }}>
-                {tr(language, 'nav.communities')}
-              </Link>
-            </div>
+          <div className="hidden lg:flex items-center gap-10">
+            <Link to="/communities" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-orange-600 transition-colors no-underline">
+              {tr(language, 'nav.communities')}
+            </Link>
+            <Link to="/music-paths" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-orange-600 transition-colors no-underline">
+              {tr(language, 'nav.musicPaths')}
+            </Link>
+            <Link to="/events" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-orange-600 transition-colors no-underline">
+              {tr(language, 'nav.events')}
+            </Link>
+          </div>
 
-            {/* Language Switcher */}
+          <div className="flex items-center gap-4">
             <LanguageSwitcher />
-
-            {/* Theme Toggle */}
+            
             <button
               onClick={toggleTheme}
-              className="w-9 h-9 rounded-full border flex items-center justify-center transition-all hover:scale-110"
-              style={{ borderColor: 'var(--color-border)' }}
+              className="w-10 h-10 rounded-full flex items-center justify-center text-lg hover:bg-orange-500/10 transition-colors"
               title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
             >
               {theme === 'light' ? '🌙' : '☀️'}
@@ -118,34 +114,35 @@ function AppContent() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-6 py-12">
+      <main className="flex-1 w-full pt-32 pb-20">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/communities" element={<CommunitiesPage />} />
           <Route path="/music-paths" element={<MusicPathsPage />} />
           <Route path="/items" element={<ItemsPage />} />
           <Route path="/item/:id" element={<ItemDetail />} />
+          <Route path="/events" element={<EventsPage />} />
         </Routes>
       </main>
 
-      {/* Footer */}
-      <footer
-        className="border-t py-10 text-sm"
-        style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg-warm)' }}
-      >
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2" style={{ color: 'var(--color-text-muted)' }}>
-            <span className="w-6 h-6 rounded bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-              </svg>
-            </span>
-            © 2025 Trumpet — The Corfiot Music Archive
-          </div>
-          <div className="flex items-center gap-6" style={{ color: 'var(--color-text-muted)' }}>
-            <a href="#" className="hover:underline">About</a>
-            <a href="#" className="hover:underline">Contact</a>
-          </div>
+      {/* Ultra-Minimal Footer */}
+      <footer className="py-20 border-t border-zinc-100 dark:border-zinc-900">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-8">
+            <div className="flex items-center gap-3">
+                <div className="w-10 h-1 rounded-full bg-orange-600" />
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">
+                    Trumpet — The Corfiot music Archive
+                </span>
+                <div className="w-10 h-1 rounded-full bg-orange-600" />
+            </div>
+            
+            <div className="flex gap-12">
+                <a href="#" className="text-xs font-bold text-zinc-400 hover:text-orange-600 transition-colors uppercase tracking-widest">About</a>
+                <a href="#" className="text-xs font-bold text-zinc-400 hover:text-orange-600 transition-colors uppercase tracking-widest">Contact</a>
+                <a href="#" className="text-xs font-bold text-zinc-400 hover:text-orange-600 transition-colors uppercase tracking-widest">Privacy</a>
+            </div>
+            
+            <p className="text-[10px] text-zinc-300 dark:text-zinc-700 font-bold uppercase tracking-widest">© 2025 All Rights Reserved</p>
         </div>
       </footer>
     </div>
