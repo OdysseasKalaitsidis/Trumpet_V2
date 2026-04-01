@@ -1,7 +1,8 @@
 import os
 from sqlmodel import SQLModel, create_engine, Session
+import models  # Force registration of all models
 from sqlalchemy import create_engine as sa_create_engine
-from typing import Generator
+from typing import Generator, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):

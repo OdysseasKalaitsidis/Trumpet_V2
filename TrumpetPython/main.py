@@ -2,10 +2,11 @@ import os
 import logging
 from typing import List
 from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from database import settings, init_db
-from routers import items, communities, collections, media
+from routers import items, communities, collections, media, community_items
 
 # Structured Logging Setup
 logging.basicConfig(
@@ -33,8 +34,22 @@ app.add_middleware(
 app.include_router(items.router)
 app.include_router(communities.router)
 app.include_router(collections.router)
-app.include_router(media.router)  # Handles /media requests via Azure Blob Storage
 app.include_router(community_items.router)
+
+# Media Serving Logic: Azure Redirect vs Local Static Files
+if settings.AZURE_STORAGE_CONNECTION_STRING:
+    app.include_router(media.router)  # Handles /media requests via Azure Blob Storage
+else:
+    # Local fallback for development
+    resources_path = settings.RESOURCES_PATH
+    if not os.path.isabs(resources_path):
+        resources_path = os.path.abspath(os.path.join(os.getcwd(), resources_path))
+    
+    if os.path.exists(resources_path):
+        app.mount("/media", StaticFiles(directory=resources_path), name="media")
+        logger.info(f"Serving local media from: {resources_path}")
+    else:
+        logger.warning(f"Resources path not found: {resources_path}")
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -59,8 +74,13 @@ async def root():
 @app.on_event("startup")
 def on_startup():
     logger.info("Initializing Trumpet Python Backend...")
-    # SQLModel will use existing tables in trumpet.db, no need to init_db() unless migrations needed
-    pass
+    # Inspecting database to verify table names at runtime
+    from sqlalchemy import inspect
+    from database import engine
+    from models.item import Item
+    inspector = inspect(engine)
+    logger.info(f"Existing tables in database: {inspector.get_table_names()}")
+    logger.info(f"Configured Item table name: {Item.__tablename__}")
 
 if __name__ == "__main__":
     import uvicorn

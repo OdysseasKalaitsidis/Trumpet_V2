@@ -1,17 +1,18 @@
 from typing import Optional
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field as SqlField, Relationship
 from pydantic import ConfigDict, alias_generators
 
 class MetadataValue(SQLModel, table=True):
+    __tablename__ = "MetadataValues"
     model_config = ConfigDict(
         alias_generator=alias_generators.to_camel,
         populate_by_name=True,
     )
 
-    id: Optional[int] = Field(default=None, primary_key=True)
-    item_id: str = Field(default="", foreign_key="item.id")
-    field: str = Field(default="")
-    value: Optional[str] = Field(default=None)
-    language: Optional[str] = Field(default=None)
+    Id: Optional[int] = SqlField(default=None, primary_key=True)
+    ItemId: str = SqlField(default="", foreign_key="Items.Id")
+    Field: str = SqlField(default="")
+    Value: Optional[str] = SqlField(default=None)
+    Language: Optional[str] = SqlField(default=None)
     
-    item: Optional["Item"] = Relationship(back_populates="metadata")
+    item: Optional["Item"] = Relationship(back_populates="metadata_entries")

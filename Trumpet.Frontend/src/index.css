@@ -176,7 +176,11 @@
   }
 
   .floating-navbar {
-    @apply fixed top-6 left-1/2 -translate-x-1/2 z-[100] px-8 py-3 rounded-full glass-card max-w-fit shadow-lg transition-all duration-500;
+    @apply fixed top-6 left-1/2 -translate-x-1/2 z-[100] px-8 py-3 rounded-full glass-card max-w-fit shadow-lg transition-none;
+  }
+
+  .floating-navbar:hover {
+    transform: translateX(-50%) translateY(0) !important;
   }
 
   .soft-gradient-bg {

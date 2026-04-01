@@ -26,14 +26,14 @@ class CommunitiesService:
             
             if search_terms:
                 statement = statement.where(
-                    or_(*[Community.introductory_text.contains(term) for term in search_terms])
+                    or_(*[Community.IntroductoryText.contains(term) for term in search_terms])
                 )
 
         results = self.session.exec(statement).all()
         return list(results)
 
     async def get_community(self, community_id: str) -> Optional[Community]:
-        statement = select(Community).where(Community.id == community_id).options(
+        statement = select(Community).where(Community.Id == community_id).options(
             selectinload(Community.collections),
             selectinload(Community.sub_communities).selectinload(Community.collections)
         )

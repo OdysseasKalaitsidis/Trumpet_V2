@@ -65,17 +65,17 @@ class TaggingService:
 
     async def generate_tags(self, item: Item) -> List[str]:
         # 1. Check Predefined Tags
-        normalized_name = item.name.lower().strip()
+        normalized_name = item.Name.lower().strip()
         for key, tags in self._predefined_tags.items():
             if key in normalized_name:
                 return tags
 
         # 2. Heuristic Analysis
-        context_text = item.name
+        context_text = item.Name
         useful_fields = ["dc.description", "dc.subject", "dc.contributor", "dc.type", "dc.title"]
-        for meta in item.metadata:
-            if any(meta.field.startswith(f) for f in useful_fields):
-                context_text += f" {meta.value}"
+        for meta in item.metadata_entries:
+            if any(meta.Field.startswith(f) for f in useful_fields):
+                context_text += f" {meta.Value}"
 
         return await self._simulated_ai_analysis(context_text)
 
@@ -113,23 +113,23 @@ class TaggingService:
     async def backfill_tags(self):
         # Implementation of backfill
         from sqlalchemy.orm import selectinload
-        statement = select(Item).options(selectinload(Item.metadata))
+        statement = select(Item).options(selectinload(Item.metadata_entries))
         items = self.session.exec(statement).all()
         
         count = 0
         for item in items:
             # Remove existing tags
-            existing_tags = [m for m in item.metadata if m.field == "trumpet.tag"]
+            existing_tags = [m for m in item.metadata_entries if m.Field == "trumpet.tag"]
             for et in existing_tags:
                 self.session.delete(et)
             
             tags = await self.generate_tags(item)
             for tag in tags:
                 new_meta = MetadataValue(
-                    item_id=item.id,
-                    field="trumpet.tag",
-                    value=tag,
-                    language="en"
+                    ItemId=item.Id,
+                    Field="trumpet.tag",
+                    Value=tag,
+                    Language="en"
                 )
                 self.session.add(new_meta)
             count += 1

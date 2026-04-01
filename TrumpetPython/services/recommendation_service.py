@@ -10,8 +10,8 @@ class RecommendationService:
 
     async def get_recommendations(self, item_id: str, max_results: int = 5) -> List[Item]:
         # 1. Get the tags of the source item
-        source_tags_statement = select(MetadataValue.value).where(
-            and_(MetadataValue.item_id == item_id, MetadataValue.field == "trumpet.tag")
+        source_tags_statement = select(MetadataValue.Value).where(
+            and_(MetadataValue.ItemId == item_id, MetadataValue.Field == "trumpet.tag")
         )
         source_tags = self.session.exec(source_tags_statement).all()
         
@@ -20,16 +20,16 @@ class RecommendationService:
 
         # 2. Find other items that have these tags and count matches
         recommendations_statement = (
-            select(MetadataValue.item_id, func.count(MetadataValue.id).label("match_count"))
+            select(MetadataValue.ItemId, func.count(MetadataValue.Id).label("match_count"))
             .where(
                 and_(
-                    MetadataValue.field == "trumpet.tag",
-                    MetadataValue.item_id != item_id,
-                    MetadataValue.value.in_(source_tags)
+                    MetadataValue.Field == "trumpet.tag",
+                    MetadataValue.ItemId != item_id,
+                    MetadataValue.Value.in_(source_tags)
                 )
             )
-            .group_by(MetadataValue.item_id)
-            .order_by(func.count(MetadataValue.id).desc())
+            .group_by(MetadataValue.ItemId)
+            .order_by(func.count(MetadataValue.Id).desc())
             .limit(max_results)
         )
         
@@ -43,15 +43,15 @@ class RecommendationService:
 
         # 3. Fetch the actual Items
         items_statement = select(Item).where(
-            Item.id.in_(recommended_item_ids)
+            Item.Id.in_(recommended_item_ids)
         ).options(
-            selectinload(Item.metadata),
+            selectinload(Item.metadata_entries),
             selectinload(Item.collection)
         )
         
         items = self.session.exec(items_statement).all()
         
         # Sort items based on match counts (since SQL IN doesn't preserve order)
-        sorted_items = sorted(items, key=lambda i: match_counts.get(i.id, 0), reverse=True)
+        sorted_items = sorted(items, key=lambda i: match_counts.get(i.Id, 0), reverse=True)
         
         return list(sorted_items)

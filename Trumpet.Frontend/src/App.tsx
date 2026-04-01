@@ -20,7 +20,7 @@ function LanguageSwitcher() {
     <div className="relative">
       <button
         onClick={() => setOpen(prev => !prev)}
-        className="w-9 h-9 rounded-full border flex items-center justify-center text-lg transition-all hover:scale-110 hover:shadow-md"
+        className="w-9 h-9 rounded-full border flex items-center justify-center text-lg hover:shadow-md"
         style={{ borderColor: 'var(--color-border)' }}
         title="Change language"
       >
@@ -34,14 +34,14 @@ function LanguageSwitcher() {
 
           {/* Dropdown */}
           <div
-            className="absolute right-0 top-12 z-50 rounded-2xl border shadow-2xl overflow-hidden min-w-[160px] animate-fade-in"
+            className="absolute right-0 top-12 z-50 rounded-2xl border shadow-2xl overflow-hidden min-w-[160px]"
             style={{ backgroundColor: 'var(--color-bg-warm)', borderColor: 'var(--color-border)' }}
           >
             {LANGUAGES.map(lang => (
               <button
                 key={lang.code}
                 onClick={() => { setLanguage(lang.code); setOpen(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors hover:bg-amber-500/10 text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-amber-500/10 text-left"
                 style={{
                   color: lang.code === language ? 'var(--color-accent)' : 'var(--color-text)',
                   fontWeight: lang.code === language ? 700 : 500,
@@ -75,24 +75,24 @@ function AppContent() {
             className="flex items-center gap-2 group no-underline"
             to="/"
           >
-            <div className="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500">
+            <div className="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center shadow-lg">
                <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
               </svg>
             </div>
-            <span className="hidden sm:block font-bold tracking-tighter text-zinc-900 dark:text-white uppercase transition-colors group-hover:text-orange-600">
+            <span className="hidden sm:block font-bold tracking-tighter text-zinc-900 dark:text-white uppercase group-hover:text-orange-600">
               Trumpet
             </span>
           </Link>
 
           <div className="hidden lg:flex items-center gap-10">
-            <Link to="/communities" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-orange-600 transition-colors no-underline">
+            <Link to="/communities" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-orange-600 no-underline">
               {tr(language, 'nav.communities')}
             </Link>
-            <Link to="/music-paths" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-orange-600 transition-colors no-underline">
+            <Link to="/music-paths" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-orange-600 no-underline">
               {tr(language, 'nav.musicPaths')}
             </Link>
-            <Link to="/events" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-orange-600 transition-colors no-underline">
+            <Link to="/events" className="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-orange-600 no-underline">
               {tr(language, 'nav.events')}
             </Link>
           </div>
@@ -102,7 +102,7 @@ function AppContent() {
             
             <button
               onClick={toggleTheme}
-              className="w-10 h-10 rounded-full flex items-center justify-center text-lg hover:bg-orange-500/10 transition-colors"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-lg hover:bg-orange-500/10"
               title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
             >
               {theme === 'light' ? '🌙' : '☀️'}

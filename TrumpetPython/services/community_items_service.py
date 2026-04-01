@@ -15,7 +15,7 @@ class CommunityItemsService:
         current_level_ids = [community_id]
 
         while current_level_ids:
-            statement = select(Community.id).where(Community.parent_community_id.in_(current_level_ids))
+            statement = select(Community.Id).where(Community.ParentCommunityId.in_(current_level_ids))
             next_level_ids = self.session.exec(statement).all()
             
             # Find IDs we haven't seen yet to prevent infinite loops and stop when no more found
@@ -27,16 +27,16 @@ class CommunityItemsService:
             current_level_ids = new_ids
 
         # 2. Find items from collections belonging to any of the found communities
-        # We join Item -> Collection to check the parent_community_id
+        # We join Item -> Collection to check the ParentCommunityId
         statement = (
             select(Item)
-            .join(Collection, Item.collection_id == Collection.id)
-            .where(Collection.parent_community_id.in_(list(all_community_ids)))
+            .join(Collection, Item.CollectionId == Collection.Id)
+            .where(Collection.ParentCommunityId.in_(list(all_community_ids)))
             .options(
-                selectinload(Item.metadata),
+                selectinload(Item.metadata_entries),
                 selectinload(Item.bitstreams)
             )
-            .order_by(Item.name)
+            .order_by(Item.Name)
         )
         
         results = self.session.exec(statement).all()

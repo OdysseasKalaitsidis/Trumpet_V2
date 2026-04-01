@@ -10,31 +10,31 @@ class ItemsService:
         self.session = session
 
     async def get_fields(self) -> List[str]:
-        statement = select(MetadataValue.field).distinct()
+        statement = select(MetadataValue.Field).distinct()
         results = self.session.exec(statement).all()
         return list(results)
 
     async def get_path_values(self) -> List[Optional[str]]:
-        statement = select(MetadataValue.value).where(
-            and_(MetadataValue.field == "dc.musicsubpath", MetadataValue.language == "en")
+        statement = select(MetadataValue.Value).where(
+            and_(MetadataValue.Field == "dc.musicsubpath", MetadataValue.Language == "en")
         ).distinct()
         results = self.session.exec(statement).all()
         return list(results)
 
     async def get_path_counts(self) -> List[Dict[str, Any]]:
         statement = (
-            select(MetadataValue.value, func.count(MetadataValue.id))
-            .where(and_(MetadataValue.field == "dc.musicsubpath", MetadataValue.language == "en"))
-            .group_by(MetadataValue.value)
+            select(MetadataValue.Value, func.count(MetadataValue.Id))
+            .where(and_(MetadataValue.Field == "dc.musicsubpath", MetadataValue.Language == "en"))
+            .group_by(MetadataValue.Value)
         )
         results = self.session.exec(statement).all()
         return [{"value": row[0], "count": row[1]} for row in results]
 
     async def search_all_metadata(self, value: str) -> List[Dict[str, Any]]:
         statement = (
-            select(MetadataValue.field, func.count(MetadataValue.id))
-            .where(MetadataValue.value.contains(value))
-            .group_by(MetadataValue.field)
+            select(MetadataValue.Field, func.count(MetadataValue.Id))
+            .where(MetadataValue.Value.contains(value))
+            .group_by(MetadataValue.Field)
         )
         results = self.session.exec(statement).all()
         return [{"field": row[0], "count": row[1]} for row in results]
@@ -50,7 +50,7 @@ class ItemsService:
     ) -> List[Item]:
         # Using selectinload to eagerly load metadata and bitstreams (similar to .Include in EF Core)
         statement = select(Item).options(
-            selectinload(Item.metadata),
+            selectinload(Item.metadata_entries),
             selectinload(Item.bitstreams)
         )
 
@@ -67,41 +67,41 @@ class ItemsService:
             
             if search_values:
                 # Filter items that have metadata with matching values
-                sub_query = select(MetadataValue.item_id).where(
+                sub_query = select(MetadataValue.ItemId).where(
                     and_(
-                        MetadataValue.field == "dc.musicsubpath",
-                        or_(*[MetadataValue.value.contains(sv) for sv in search_values])
+                        MetadataValue.Field == "dc.musicsubpath",
+                        or_(*[MetadataValue.Value.contains(sv) for sv in search_values])
                     )
                 )
-                statement = statement.where(Item.id.in_(sub_query))
+                statement = statement.where(Item.Id.in_(sub_query))
 
         if community_id:
             # Filter by community (via collection)
-            coll_sub_query = select(Collection.id).where(Collection.parent_community_id == community_id)
-            statement = statement.where(Item.collection_id.in_(coll_sub_query))
+            coll_sub_query = select(Collection.Id).where(Collection.ParentCommunityId == community_id)
+            statement = statement.where(Item.CollectionId.in_(coll_sub_query))
 
         if collection_id:
-            statement = statement.where(Item.collection_id == collection_id)
+            statement = statement.where(Item.CollectionId == collection_id)
 
         if search:
             # Search in Name or any Metadata value
-            meta_sub_query = select(MetadataValue.item_id).where(MetadataValue.value.contains(search))
+            meta_sub_query = select(MetadataValue.ItemId).where(MetadataValue.Value.contains(search))
             statement = statement.where(
                 or_(
-                    Item.name.contains(search),
-                    Item.id.in_(meta_sub_query)
+                    Item.Name.contains(search),
+                    Item.Id.in_(meta_sub_query)
                 )
             )
 
         # Pagination
-        statement = statement.order_by(Item.name).offset((page - 1) * page_size).limit(page_size)
+        statement = statement.order_by(Item.Name).offset((page - 1) * page_size).limit(page_size)
         
         results = self.session.exec(statement).all()
         return list(results)
 
     async def get_item(self, id: str) -> Optional[Item]:
-        statement = select(Item).where(Item.id == id).options(
-            selectinload(Item.metadata),
+        statement = select(Item).where(Item.Id == id).options(
+            selectinload(Item.metadata_entries),
             selectinload(Item.bitstreams)
         )
         result = self.session.exec(statement).first()
