@@ -27,3 +27,10 @@ resources/*
 # OS
 .DS_Store
 Thumbs.db
+
+# Video files
+*.mp4
+*.mov
+*.webm
+*.avi
+*.mkv

@@ -53,16 +53,17 @@ The project is configured to look for these folders using absolute paths in `Tru
 Once your files are in place:
 
 1.  **Start the Backend:**
-    ```powershell
-    cd Trumpet.Backend
-    dotnet run
+    ```bash
+    cd TrumpetPython
+    pip install -r requirements.txt
+    python main.py
     ```
-    *(Ensure it is listening on http://localhost:5000)*
+    *(Ensure it is listening on http://localhost:8000)*
 
 2.  **Trigger Data Ingestion:**
     Open a terminal and run the following command to populate the database:
     ```bash
-    curl -X POST http://localhost:5000/api/import/extract
+    curl -X POST http://localhost:8000/api/import/extract
     ```
     *   This process runs in the background.
     *   It imports Communities, Collections, and most importantly, parses `hierarchy.json` to link them correctly.

@@ -27,7 +27,7 @@ jobs:
       - name: Build & push backend
         uses: docker/build-push-action@v5
         with:
-          context: ./Trumpet.Backend
+          context: ./TrumpetPython
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:${{ github.sha }},${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE }}:latest
 

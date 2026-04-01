@@ -37,10 +37,13 @@ docker build -t <your_registry_name>.azurecr.io/trumpet-backend:latest ./Trumpet
 docker push <your_registry_name>.azurecr.io/trumpet-backend:latest
 ```
 
-### Step 3.2: Configure Azure App Service
-1.  **Web App for Containers**: Create a new Web App using the image from your ACR.
-2.  **Port Mapping**: Set `WEBSITES_PORT=80` in App Settings (the Dockerfile exposes port 80).
-3.  **Health Probe**: Set the health check path to `/health`.
+### 3.3 Persistent Storage for SQLite
+By default, files inside a container are ephemeral. To persist your database:
+1.  **Mount Azure Files**: Map a share to `/data` in your App Service.
+2.  **Environment Variable**: Set `DATABASE_URL=sqlite:////data/trumpet.db`.
+3.  **Permissions**: Ensure the `/data` directory is writable by the container user.
+
+---
 
 ## 4. Media Migration to Azure Blob Storage
 To move your existing local assets to the cloud, use the provided migration script:
@@ -54,19 +57,22 @@ To move your existing local assets to the cloud, use the provided migration scri
 > [!TIP]
 > The `/media` endpoint in the API handles the redirection automatically. Once your files are in Blob Storage, the backend will generate secure **SAS URLs** with 1-hour expiry for every request.
 
+---
+
 ## 5. Monitoring & Performance
 
 ### 5.1 Gunicorn Scaling
 The `Dockerfile` is pre-configured with `gunicorn` and `4` worker processes. 
 - For higher traffic, increase the worker count (`-w` flag in Dockerfile) or scale the Azure App Service horizontally.
 
-### 5.2 Logging
-Logs are outputted to `stdout` in a structured format. You can view them in the Azure Portal via **Log Stream** or by connecting the app to **Application Insights**.
+---
 
-### 5.3 Health Checks
+## 6. Health Checks
 The `/health` endpoint returns:
 - `200 OK` when the app is initialized.
 - Use this in Azure's **Health Check** settings to ensure automatic instance restarts if the app becomes unresponsive.
+
+---
 
 ## 6. Security Considerations
 - **CORS**: Ensure `ALLOWED_ORIGINS` is strictly limited to your frontend domain.
