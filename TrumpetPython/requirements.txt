@@ -1,0 +1,9 @@
+fastapi[all]
+sqlmodel
+uvicorn
+gunicorn
+python-dotenv
+httpx
+pydantic-settings
+aiosqlite
+azure-storage-blob

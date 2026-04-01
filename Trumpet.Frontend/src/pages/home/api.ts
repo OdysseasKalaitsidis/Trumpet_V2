@@ -39,7 +39,7 @@ export async function fetchItems(
 }
 
 export const fetchPaths = async (): Promise<any[]> => {
-  const response = await fetch(`${API_BASE_URL}/items/path-values`);
+  const response = await fetch(`${API_BASE_URL}/api/items/path-values`);
   return await response.json();
 };
 
