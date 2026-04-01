@@ -3,25 +3,23 @@ version: "3.9"
 services:
   backend:
     build:
-      context: ./Trumpet.Backend
+      context: ./TrumpetPython
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8000:80"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      # Override CORS origins — set to your frontend URL in production
-      # - AllowedOrigins__0=https://your-frontend-domain.com
+      - DATABASE_URL=sqlite:////data/trumpet.db
+      - ALLOWED_ORIGINS=http://localhost
     volumes:
-      - ./data/database/trumpet.db:/data/trumpet.db
-      - ./data/raw:/data/raw:ro
-      - ./resources:/media:ro
+      - ./data/database:/data
+      - ./resources:/app/resources:ro
 
   frontend:
     build:
       context: ./Trumpet.Frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_BASE_URL=http://localhost:8080
+        - VITE_API_BASE_URL=http://localhost:8000
     ports:
       - "80:80"
     depends_on:

@@ -203,6 +203,7 @@ export default function CommunityCarousel() {
                   <img
                     src={logoFile ? `/media/${logoFile}` : `/media/${c.id}.png`}
                     alt={`${c.name} logo`}
+                    loading="lazy"
                     className="w-12 h-12 object-contain rounded-full bg-white/10 p-1"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';

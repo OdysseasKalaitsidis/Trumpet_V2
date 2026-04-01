@@ -13,10 +13,10 @@ trumpet_data/
 │       ├── communities_*.json
 │       ├── collections_*.json
 │       └── hierarchy_*.json     <-- Critical for Community->Collection links!
-├── resources/                   <-- Rename your 'out' folder to 'resources'
-│   └── [uuid]/                  <-- Item folders containing item_expanded.json
-├── Trumpet.Backend/
-└── Trumpet.Frontend/
+├── resources/                   <-- Media files (formerly 'out')
+│   └── [uuid]/                  <-- Item folders
+├── TrumpetPython/               <-- FastAPI Backend
+└── Trumpet.Frontend/            <-- React Frontend
 ```
 
 ### 1. Metadata Files (`data/raw`)
@@ -35,16 +35,14 @@ Place the following JSON export files into `data/raw`:
 
 ## ⚙️ Configuration
 
-The project is configured to look for these folders using absolute paths in `Trumpet.Backend/appsettings.json`.
+The project uses a `.env` file (or environment variables in production) inside the `TrumpetPython` directory.
 
-**Verify `appsettings.json`:**
-```json
-"ProjectSettings": {
-  "ResourcesPath": "../resources",
-  "RawDataPath": "../data/raw"
-}
-```
-*Note: These relative paths work automatically on both Windows and Mac.*
+**Verify `.env` or App Settings:**
+- `DATABASE_URL`: `sqlite:///../data/database/trumpet.db`
+- `RESOURCES_PATH`: `../resources`
+- `ALLOWED_ORIGINS`: `http://localhost:5173` (comma-separated URLs)
+
+*Note: Relative paths work automatically across operating systems.*
 
 ---
 
@@ -70,8 +68,8 @@ Once your files are in place:
     *   Finally, it ingests all Items from the `resources` folder.
 
 3.  **Verify:**
-    *   Visit `http://localhost:5000/api/communities` to see the structure.
-    *   Visit `http://localhost:5000/api/items/path-counts` to see item distribution.
+    *   Visit `http://localhost:8000/docs` to see the Interactive API documentation (Swagger).
+    *   Visit `http://localhost:8000/health` to check system status.
 
 ### 4. Running the Frontend
 

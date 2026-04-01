@@ -71,6 +71,7 @@ export default function ItemsPage() {
                 <img
                 src={`/media/${logoFile}`}
                 alt={`${communityName} logo`}
+                loading="lazy"
                 className="w-24 h-24 object-contain rounded-[2.5rem] glass-card p-4 shadow-sm"
                 />
             )}
@@ -130,6 +131,7 @@ export default function ItemsPage() {
                         <img
                         src={coverUrl}
                         alt={item.name}
+                        loading="lazy"
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                         />
                     ) : (

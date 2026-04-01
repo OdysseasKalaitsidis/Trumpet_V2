@@ -8,11 +8,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-### Backend (from `Trumpet.Backend/`)
+### Backend (from `TrumpetPython/`)
 ```bash
-dotnet run          # Start API server on http://localhost:5000
-dotnet build        # Compile
-dotnet watch run    # Run with hot reload
+pip install -r requirements.txt  # Build environment
+python main.py                   # Start FastAPI server on http://localhost:8000
+python verify_alignment.py       # Check DB schema alignment
 ```
 
 ### Frontend (from `Trumpet.Frontend/`)
@@ -32,15 +32,13 @@ curl -X POST http://localhost:5000/api/import/extract
 
 ## Architecture
 
-### Backend (`Trumpet.Backend/`)
-- **ASP.NET Core 8** REST API with **Entity Framework Core** and **SQLite** (`data/database/trumpet.db`)
-- **Service layer pattern**: controllers delegate to injected services (`IItemsService`, `ICommunitiesService`, etc.)
-- **Data models hierarchy**: `Community → Collection → Item → MetadataValue / Bitstream`
-- Tags are stored as `MetadataValue` records with `Field = "trumpet.tag"`
-- Media files served as static files from `/resources` at the `/media` URL prefix
-- `DataImportService` reads JSON files from `data/raw/` and populates the DB; `hierarchy_*.json` is critical for linking collections to communities
-- `AITaggingService` uses predefined mappings + heuristics (not a real LLM) to generate tags
-- `RecommendationService` matches items by shared tags
+### Backend (`TrumpetPython/`)
+- **Python 3.11** with **FastAPI**, **SQLModel**, and **SQLite** (`data/database/trumpet.db`).
+- **Gunicorn** with **Uvicorn** workers for production deployment.
+- **Service layer pattern**: Routers delegate to services (`items_service.py`, `communities_service.py`, etc.).
+- **Data models hierarchy**: `Community → Collection → Item → MetadataValue`.
+- Media files served via local static files OR redirected to **Azure Blob Storage** based on configuration.
+- **Data ingestion**: `api/import/extract` endpoint triggers extraction from `data/raw/` and `resources/`.
 
 ### Frontend (`Trumpet.Frontend/src/`)
 - **React Router v7** with page components in `pages/` (home, communities, items, item-detail, music-paths)
@@ -59,10 +57,10 @@ resources/         # Media files organized by item UUID
 ```
 
 ### Key Configuration
-`Trumpet.Backend/appsettings.json`:
-```json
-{
-  "ConnectionStrings": { "DefaultConnection": "Data Source=../data/database/trumpet.db" },
-  "ProjectSettings": { "ResourcesPath": "../resources", "RawDataPath": "../data/raw" }
-}
+`TrumpetPython/.env`:
+```env
+DATABASE_URL=sqlite:///../data/database/trumpet.db
+RESOURCES_PATH=../resources
+ALLOWED_ORIGINS=http://localhost:5173
 ```
+*Note: Configured via Pydantic Settings in `database.py`.*

@@ -1,6 +1,7 @@
 from typing import List, Optional
 from sqlmodel import Session, select, or_
 from sqlalchemy.orm import selectinload
+from starlette.concurrency import run_in_threadpool
 from models.community import Community
 
 class CommunitiesService:
@@ -29,7 +30,7 @@ class CommunitiesService:
                     or_(*[Community.IntroductoryText.contains(term) for term in search_terms])
                 )
 
-        results = self.session.exec(statement).all()
+        results = await run_in_threadpool(lambda: self.session.exec(statement).all())
         return list(results)
 
     async def get_community(self, community_id: str) -> Optional[Community]:
@@ -37,5 +38,5 @@ class CommunitiesService:
             selectinload(Community.collections),
             selectinload(Community.sub_communities).selectinload(Community.collections)
         )
-        result = self.session.exec(statement).first()
+        result = await run_in_threadpool(lambda: self.session.exec(statement).first())
         return result

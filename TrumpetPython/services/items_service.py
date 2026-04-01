@@ -1,34 +1,44 @@
 from typing import List, Optional, Any, Dict
 from sqlmodel import Session, select, func, or_, and_
 from sqlalchemy.orm import selectinload
+from starlette.concurrency import run_in_threadpool
+from functools import lru_cache
 from models.item import Item
 from models.metadata_value import MetadataValue
 from models.collection import Collection
 
 class ItemsService:
+    _cache = {}
+
     def __init__(self, session: Session):
         self.session = session
 
     async def get_fields(self) -> List[str]:
+        if "fields" in self._cache:
+            return self._cache["fields"]
         statement = select(MetadataValue.Field).distinct()
-        results = self.session.exec(statement).all()
-        return list(results)
+        results = await run_in_threadpool(lambda: self.session.exec(statement).all())
+        self._cache["fields"] = list(results)
+        return self._cache["fields"]
 
     async def get_path_values(self) -> List[Optional[str]]:
         statement = select(MetadataValue.Value).where(
             and_(MetadataValue.Field == "dc.musicsubpath", MetadataValue.Language == "en")
         ).distinct()
-        results = self.session.exec(statement).all()
+        results = await run_in_threadpool(lambda: self.session.exec(statement).all())
         return list(results)
 
     async def get_path_counts(self) -> List[Dict[str, Any]]:
+        if "path_counts" in self._cache:
+            return self._cache["path_counts"]
         statement = (
             select(MetadataValue.Value, func.count(MetadataValue.Id))
             .where(and_(MetadataValue.Field == "dc.musicsubpath", MetadataValue.Language == "en"))
             .group_by(MetadataValue.Value)
         )
-        results = self.session.exec(statement).all()
-        return [{"value": row[0], "count": row[1]} for row in results]
+        results = await run_in_threadpool(lambda: self.session.exec(statement).all())
+        self._cache["path_counts"] = [{"value": row[0], "count": row[1]} for row in results]
+        return self._cache["path_counts"]
 
     async def search_all_metadata(self, value: str) -> List[Dict[str, Any]]:
         statement = (
@@ -36,7 +46,7 @@ class ItemsService:
             .where(MetadataValue.Value.contains(value))
             .group_by(MetadataValue.Field)
         )
-        results = self.session.exec(statement).all()
+        results = await run_in_threadpool(lambda: self.session.exec(statement).all())
         return [{"field": row[0], "count": row[1]} for row in results]
 
     async def get_items(
@@ -96,7 +106,7 @@ class ItemsService:
         # Pagination
         statement = statement.order_by(Item.Name).offset((page - 1) * page_size).limit(page_size)
         
-        results = self.session.exec(statement).all()
+        results = await run_in_threadpool(lambda: self.session.exec(statement).all())
         return list(results)
 
     async def get_item(self, id: str) -> Optional[Item]:
@@ -104,5 +114,5 @@ class ItemsService:
             selectinload(Item.metadata_entries),
             selectinload(Item.bitstreams)
         )
-        result = self.session.exec(statement).first()
+        result = await run_in_threadpool(lambda: self.session.exec(statement).first())
         return result
