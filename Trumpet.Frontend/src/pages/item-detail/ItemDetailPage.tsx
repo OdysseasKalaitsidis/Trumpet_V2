@@ -248,7 +248,16 @@ export default function ItemDetail() {
                             </button>
                         </div>
                         <div className="flex-1 bg-white/10">
-                            <iframe src={getMediaUrl(selectedFile.localFilePath)} className="w-full h-full border-none" title="Archive Viewer"></iframe>
+                            {getMediaUrl(selectedFile.localFilePath) ? (
+                                <iframe src={getMediaUrl(selectedFile.localFilePath)} className="w-full h-full border-none" title="Archive Viewer"></iframe>
+                            ) : (
+                                <div className="w-full h-full flex flex-col items-center justify-center p-20 text-center">
+                                    <span className="text-6xl mb-8">⚠️</span>
+                                    <p className="text-zinc-400 font-bold uppercase tracking-widest text-sm max-w-md">
+                                        This file cannot be previewed directly. Please check the file format or contact the administrator.
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

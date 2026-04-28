@@ -12,8 +12,6 @@ export function useItems(pathFilter: string, searchQuery: string, communityId?: 
       setLoading(true);
       setError(null);
       
-      console.log("[useItems] Starting fetch with:", { pathFilter, searchQuery, communityId });
-      
       try {
         let data: Item[];
         // Prioritize collectionId if present, even within a community context
@@ -21,13 +19,9 @@ export function useItems(pathFilter: string, searchQuery: string, communityId?: 
           data = await fetchItems(undefined, searchQuery, undefined, collectionId);
         } else if (communityId) {
           data = await fetchCommunityItems(communityId);
-          console.log("[useItems] Community items response:", data);
         } else {
-          console.log("[useItems] Fetching items with path/search filters");
           data = await fetchItems(pathFilter, searchQuery);
-          console.log("[useItems] Items response:", data);
         }
-        console.log("[useItems] Total items fetched:", data.length);
         setItems(data);
       } catch (err) {
         console.error("[useItems] Error fetching items:", err);
