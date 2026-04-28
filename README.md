@@ -19,10 +19,10 @@ The system is built on a single-server, hybrid architecture that prioritizes spe
 
 ```text
 trumpet_data/
-├── data/backend/       # PHP Slim 4 API (Business Logic & Database Access)
+├── Backend/            # PHP Slim 4 API (Business Logic & Database Access)
 ├── database/           # MySQL Schema, Dumps, and Migration Utilities
 ├── python_services/    # Decoupled CLI services for AI-driven tagging
-├── Trumpet.Frontend/   # React/TypeScript source code
+├── Frontend/           # React/TypeScript source code
 ├── resources/          # Local media repository (Asset storage)
 ├── nginx/              # Production web server configurations
 └── scripts/            # Automation and maintenance scripts
@@ -44,7 +44,7 @@ SOURCE database/dump.sql;
 
 ### 2. Backend Configuration
 ```bash
-cd data/backend
+cd Backend
 composer install
 cp .env.example .env
 # Update .env with your DB credentials and local paths
@@ -52,7 +52,7 @@ cp .env.example .env
 
 ### 3. Frontend Configuration
 ```bash
-cd Trumpet.Frontend
+cd Frontend
 npm install
 npm run dev
 ```

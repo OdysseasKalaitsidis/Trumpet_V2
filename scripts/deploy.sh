@@ -11,12 +11,12 @@ echo "==> [1/4] Pulling latest code..."
 git pull
 
 echo "==> [2/4] Installing PHP dependencies..."
-cd backend
+cd Backend
 composer install --no-dev --optimize-autoloader
 cd ..
 
 echo "==> [3/4] Building frontend..."
-cd Trumpet.Frontend
+cd Frontend
 # Ensure the correct env is used for production
 cp .env.production .env
 npm install
