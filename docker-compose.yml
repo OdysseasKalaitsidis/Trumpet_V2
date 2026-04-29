@@ -1,0 +1,25 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: trumpet_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: trumpet
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - ./database/data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
+  web:
+    build: .
+    container_name: trumpet_web
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - db
+    volumes:
+      - ./resources:/var/www/trumpet/resources
+    env_file:
+      - Backend/.env
