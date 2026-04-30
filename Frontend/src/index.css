@@ -6,33 +6,33 @@
 
 :root,
 [data-theme="light"] {
-  /* Light theme (Europeana-inspired) */
-  --color-bg: #FDFBF7;
-  --color-bg-warm: #F8F5F0;
-  --color-bg-muted: #F0EBE3;
-  --color-text: #333333;
-  --color-text-muted: #666666;
-  --color-text-light: black;
-  --color-accent: #d97706;
-  --color-accent-hover: #b45309;
-  --color-border: #E5E0D8;
-  --color-border-light: #F0EBE3;
-  --color-surface: rgba(0, 0, 0, 0.05);
+  /* Light theme: Sophisticated Warm White */
+  --color-bg: #FCFAF7;
+  --color-bg-warm: #F7F2EB;
+  --color-bg-muted: #EEE7DD;
+  --color-text: #1C1917;
+  --color-text-muted: #57534E;
+  --color-text-light: #78716C;
+  --color-accent: #EA580C;
+  --color-accent-hover: #C2410C;
+  --color-border: #E7E5E4;
+  --color-border-light: #F5F5F4;
+  --color-surface: rgba(255, 255, 255, 0.6);
 }
 
 [data-theme="dark"] {
-  /* Dark theme */
-  --color-bg: #0a0a0a;
-  --color-bg-warm: #111111;
-  --color-bg-muted: #1a1a1a;
-  --color-text: #f5f5f5;
-  --color-text-muted: #a0a0a0;
-  --color-text-light: #666666;
-  --color-accent: #f59e0b;
-  --color-accent-hover: #fbbf24;
-  --color-border: #333333;
-  --color-border-light: #222222;
-  --color-surface: rgba(255, 255, 255, 0.05);
+  /* Dark theme: Deep Obsidian */
+  --color-bg: #0C0A09;
+  --color-bg-warm: #1C1917;
+  --color-bg-muted: #292524;
+  --color-text: #FAFAF9;
+  --color-text-muted: #A8A29E;
+  --color-text-light: #57534E;
+  --color-accent: #FB923C;
+  --color-accent-hover: #FDBA74;
+  --color-border: #292524;
+  --color-border-light: #1C1917;
+  --color-surface: rgba(0, 0, 0, 0.4);
 }
 
 @layer base {
@@ -185,8 +185,13 @@
 
   .soft-gradient-bg {
     @apply fixed inset-0 -z-10 pointer-events-none;
-    background: radial-gradient(circle at 0% 0%, rgba(255, 237, 213, 0.4) 0%, transparent 40%),
-                radial-gradient(circle at 100% 100%, rgba(255, 237, 213, 0.3) 0%, transparent 40%);
+    background: radial-gradient(circle at 0% 0%, rgba(234, 88, 12, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(234, 88, 12, 0.05) 0%, transparent 40%);
+  }
+
+  .noise-overlay {
+    @apply fixed inset-0 -z-[5] pointer-events-none opacity-[0.03] dark:opacity-[0.05];
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   }
 
   /* Animations */

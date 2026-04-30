@@ -67,18 +67,17 @@ function AppContent() {
     <div className="flex flex-col min-h-screen transition-colors duration-500 overflow-x-hidden">
       {/* Soft Ethereal Background */}
       <div className="soft-gradient-bg" />
+      <div className="noise-overlay" />
 
       {/* Floating Glass Navbar */}
       <header className="floating-navbar w-[calc(100%-3rem)] md:w-max">
         <nav className="flex items-center gap-8 md:gap-12">
           <Link
-            className="flex items-center gap-2 group no-underline"
+            className="flex items-center gap-3 group no-underline"
             to="/"
           >
-            <div className="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center shadow-lg">
-               <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-              </svg>
+            <div className="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-white flex items-center justify-center shadow-xl overflow-hidden group-hover:scale-105 transition-transform duration-300">
+               <img src="/logo.png" alt="Trumpet Logo" className="w-full h-full object-cover" />
             </div>
             <span className="hidden sm:block font-bold tracking-tighter text-zinc-900 dark:text-white uppercase group-hover:text-orange-600">
               Trumpet
