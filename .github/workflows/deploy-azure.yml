@@ -1,0 +1,115 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Trumpet — GitHub Actions CI/CD Pipeline
+# Trigger: push to main branch
+# Flow:    Build Docker image → Push to ACR → Deploy to Azure Container Apps
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: 🚀 Build & Deploy to Azure
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:   # Allow manual trigger from GitHub UI
+
+env:
+  ACR_NAME: trumpetacrprod
+  CONTAINER_APP_NAME: trumpet-prod-web
+  RESOURCE_GROUP: trumpet-prod-rg
+  IMAGE_NAME: trumpet
+
+jobs:
+  # ── Job 1: Build & Push Docker image to ACR ──────────────────────────────────
+  build-and-push:
+    name: 🐳 Build & Push to ACR
+    runs-on: ubuntu-latest
+
+    outputs:
+      image-tag: ${{ steps.meta.outputs.version }}
+
+    steps:
+      - name: ⬇️ Checkout source code
+        uses: actions/checkout@v4
+
+      - name: 🔑 Log in to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 🔑 Log in to Azure Container Registry
+        run: az acr login --name ${{ env.ACR_NAME }}
+
+      - name: 🏷️ Generate image metadata (tag = git SHA short)
+        id: meta
+        run: |
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          echo "version=${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "Image tag: ${SHORT_SHA}"
+
+      - name: 🔨 Build Docker image
+        run: |
+          docker build \
+            --tag ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }} \
+            --tag ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest \
+            --file Dockerfile \
+            .
+
+      - name: 📤 Push image to ACR
+        run: |
+          docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
+          docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+
+  # ── Job 2: Deploy new image to Azure Container Apps ──────────────────────────
+  deploy:
+    name: 🚀 Deploy to Azure Container Apps
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    environment: production     # GitHub environment with approval gate (optional)
+
+    steps:
+      - name: 🔑 Log in to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 🚀 Deploy new Container App revision
+        run: |
+          az containerapp update \
+            --name ${{ env.CONTAINER_APP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --image ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ needs.build-and-push.outputs.image-tag }}
+
+      - name: 🌐 Get live URL
+        id: get-url
+        run: |
+          URL=$(az containerapp show \
+            --name ${{ env.CONTAINER_APP_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --query "properties.configuration.ingress.fqdn" \
+            --output tsv)
+          echo "url=https://${URL}" >> $GITHUB_OUTPUT
+          echo "🌐 Deployed to: https://${URL}"
+
+      - name: 🩺 Smoke test (verify app responds)
+        run: |
+          echo "Running smoke test against ${{ steps.get-url.outputs.url }}"
+          for i in {1..5}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.get-url.outputs.url }})
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Smoke test passed — HTTP $STATUS"
+              exit 0
+            fi
+            echo "⏳ Attempt $i: HTTP $STATUS — waiting 15s..."
+            sleep 15
+          done
+          echo "❌ Smoke test failed after 5 attempts"
+          exit 1
+
+      - name: 📋 Print deployment summary
+        run: |
+          echo "### ✅ Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **Image Tag** | \`${{ needs.build-and-push.outputs.image-tag }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Live URL** | ${{ steps.get-url.outputs.url }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Triggered by** | @${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY

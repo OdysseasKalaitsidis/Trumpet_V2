@@ -1,28 +1,25 @@
-version: "3.9"
-
 services:
-  backend:
-    build:
-      context: ./Trumpet.Backend
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
+  db:
+    image: mysql:8.0
+    container_name: trumpet_db
+    restart: always
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      # Override CORS origins — set to your frontend URL in production
-      # - AllowedOrigins__0=https://your-frontend-domain.com
+      MYSQL_DATABASE: trumpet
+      MYSQL_ROOT_PASSWORD: password
     volumes:
-      - ./data/database/trumpet.db:/data/trumpet.db
-      - ./data/raw:/data/raw:ro
-      - ./resources:/media:ro
+      - ./database/data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
 
-  frontend:
-    build:
-      context: ./Trumpet.Frontend
-      dockerfile: Dockerfile
-      args:
-        - VITE_API_BASE_URL=http://localhost:8080
+  web:
+    build: .
+    container_name: trumpet_web
+    restart: always
     ports:
       - "80:80"
+      - "443:443"
     depends_on:
-      - backend
+      - db
+    volumes:
+      - ./resources:/var/www/trumpet/resources
+    env_file:
+      - Backend/.env

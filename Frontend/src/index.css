@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+[data-theme="light"] {
+  /* Light theme: Sophisticated Warm White */
+  --color-bg: #FCFAF7;
+  --color-bg-warm: #F7F2EB;
+  --color-bg-muted: #EEE7DD;
+  --color-text: #1C1917;
+  --color-text-muted: #57534E;
+  --color-text-light: #78716C;
+  --color-accent: #EA580C;
+  --color-accent-hover: #C2410C;
+  --color-border: #E7E5E4;
+  --color-border-light: #F5F5F4;
+  --color-surface: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="dark"] {
+  /* Dark theme: Deep Obsidian */
+  --color-bg: #0C0A09;
+  --color-bg-warm: #1C1917;
+  --color-bg-muted: #292524;
+  --color-text: #FAFAF9;
+  --color-text-muted: #A8A29E;
+  --color-text-light: #57534E;
+  --color-accent: #FB923C;
+  --color-accent-hover: #FDBA74;
+  --color-border: #292524;
+  --color-border-light: #1C1917;
+  --color-surface: rgba(0, 0, 0, 0.4);
+}
+
+@layer base {
+
+  html,
+  body {
+    @apply h-full;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    @apply antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+@layer components {
+
+  /* Container */
+  .container-narrow {
+    @apply max-w-5xl mx-auto px-6;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-white rounded-lg border transition-all duration-300;
+    border-color: var(--color-border);
+  }
+
+  .card:hover {
+    @apply shadow-lg;
+    transform: translateY(-2px);
+  }
+
+  .card-simple {
+    @apply bg-white/50 rounded-lg p-6;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium transition-all duration-200;
+  }
+
+  .btn-primary {
+    background-color: var(--color-accent);
+    @apply text-white;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-accent-hover);
+  }
+
+  .btn-outline {
+    @apply border-2 bg-transparent;
+    border-color: var(--color-text);
+    color: var(--color-text);
+  }
+
+  .btn-outline:hover {
+    background-color: var(--color-text);
+    @apply text-white;
+  }
+
+  /* Section headers */
+  .section-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    @apply text-3xl md:text-4xl font-semibold mb-4;
+    color: var(--color-text);
+  }
+
+  .section-subtitle {
+    @apply text-lg;
+    color: var(--color-text-muted);
+  }
+
+  /* Links */
+  .link-arrow {
+    @apply inline-flex items-center gap-2 font-medium transition-colors;
+    color: var(--color-accent);
+  }
+
+  .link-arrow:hover {
+    color: var(--color-accent-hover);
+  }
+
+  .link-arrow::after {
+    content: '→';
+    @apply transition-transform;
+  }
+
+  .link-arrow:hover::after {
+    @apply translate-x-1;
+  }
+
+  /* Path Card */
+  .path-card {
+    @apply relative overflow-hidden rounded-xl transition-all duration-300 cursor-pointer;
+    background-color: var(--color-bg-warm);
+    border: 1px solid var(--color-border);
+  }
+
+  .path-card:hover {
+    @apply shadow-xl;
+    transform: translateY(-4px);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: var(--color-bg-muted);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    @apply rounded;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-text-light);
+  }
+
+  /* Ultra-Minimalist Glassmorphism Utilities */
+  .glass-card {
+    @apply bg-white/40 dark:bg-zinc-900/40 backdrop-blur-xl border border-white/40 dark:border-zinc-800/40 transition-all duration-500;
+  }
+
+  .glass-card:hover {
+    @apply bg-white/60 dark:bg-zinc-900/60 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)];
+    transform: translateY(-4px);
+  }
+
+  .floating-navbar {
+    @apply fixed top-6 left-1/2 -translate-x-1/2 z-[100] px-8 py-3 rounded-full glass-card max-w-fit shadow-lg transition-none;
+  }
+
+  .floating-navbar:hover {
+    transform: translateX(-50%) translateY(0) !important;
+  }
+
+  .soft-gradient-bg {
+    @apply fixed inset-0 -z-10 pointer-events-none;
+    background: radial-gradient(circle at 0% 0%, rgba(234, 88, 12, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(234, 88, 12, 0.05) 0%, transparent 40%);
+  }
+
+  .noise-overlay {
+    @apply fixed inset-0 -z-[5] pointer-events-none opacity-[0.03] dark:opacity-[0.05];
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.8s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+}

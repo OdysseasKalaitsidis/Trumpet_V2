@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "westeurope"
+    },
+    "environment": {
+      "value": "prod"
+    },
+    "mysqlAdminUser": {
+      "value": "trumpetadmin"
+    },
+    "mysqlAdminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/REPLACE_WITH_YOUR_SUBSCRIPTION_ID/resourceGroups/trumpet-prod-rg/providers/Microsoft.KeyVault/vaults/trumpet-prod-kv"
+        },
+        "secretName": "mysql-admin-password"
+      }
+    },
+    "apiKey": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/REPLACE_WITH_YOUR_SUBSCRIPTION_ID/resourceGroups/trumpet-prod-rg/providers/Microsoft.KeyVault/vaults/trumpet-prod-kv"
+        },
+        "secretName": "api-key"
+      }
+    }
+  }
+}

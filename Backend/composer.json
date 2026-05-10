@@ -1,0 +1,21 @@
+{
+  "name": "trumpet/backend",
+  "description": "Trumpet PHP backend — Slim 4, MySQL, Azure Blob",
+  "type": "project",
+  "require": {
+    "php": ">=8.2",
+    "slim/slim": "^4.0",
+    "slim/psr7": "^1.0",
+    "vlucas/phpdotenv": "^5.6",
+    "microsoft/azure-storage-blob": "^1.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "Trumpet\\": "src/"
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  }
+}

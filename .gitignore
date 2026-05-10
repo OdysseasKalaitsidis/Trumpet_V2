@@ -1,12 +1,11 @@
-# .NET
-[Bb]in/
-[Oo]bj/
-*.user
-*.suo
-*.sln.docstates
+# Environment Variables
+.env
+.env.*
+!.env.example
 
-# Node / Frontend
+# Dependencies
 node_modules/
+vendor/
 dist/
 .eslintcache
 .vite/
@@ -20,6 +19,11 @@ data/database/*.db-wal
 resources/*
 !resources/.gitkeep
 
+# Python
+__pycache__/
+*.py[cod]
+*.ipynb_checkpoints/
+
 # IDEs
 .vs/
 .vscode/
@@ -27,3 +31,13 @@ resources/*
 # OS
 .DS_Store
 Thumbs.db
+
+# Media
+*.mp4
+*.mov
+*.webm
+*.avi
+*.mkv
+*.mp3
+*.wav
+*.flac

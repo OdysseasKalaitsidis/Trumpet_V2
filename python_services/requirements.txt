@@ -1,0 +1,8 @@
+# python_services — requirements
+# --------------------------------
+# These scripts use ONLY Python stdlib (json, sys, sqlite3).
+# No pip packages are required.
+# Python 3.9+ is needed for dict[str, list[str]] type hints.
+#
+# To verify your Python version:
+#   python3 --version
