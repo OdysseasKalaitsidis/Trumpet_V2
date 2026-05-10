@@ -57,6 +57,25 @@ npm install
 npm run dev
 ```
 
+## ☁️ Azure Deployment (DevOps Showcase)
+
+The system is ready for a professional Azure deployment using modern cloud-native practices.
+
+### Architecture
+- **Azure Container Apps**: Serverless container orchestration for the PHP/Nginx/Python unified image.
+- **Azure Database for MySQL**: Managed Flexible Server for the data layer.
+- **Azure Blob Storage**: Cloud-native storage for media assets (with SAS token security).
+- **Azure Key Vault**: Secure management of application secrets and connection strings.
+- **GitHub Actions**: Fully automated CI/CD pipeline (Build → Push to ACR → Deploy).
+
+### Deployment Steps
+1. **Provision Infrastructure**: Run the one-shot PowerShell script:
+   ```powershell
+   ./scripts/provision-azure.ps1
+   ```
+2. **Setup CI/CD**: Add the `AZURE_CREDENTIALS` secret to your GitHub repository (the script outputs the JSON for you).
+3. **Push to Main**: Any push to the `main` branch will now automatically build and deploy to Azure.
+
 ## 🛠️ Key Engineering Solutions
 
 ### Robust Data Integrity

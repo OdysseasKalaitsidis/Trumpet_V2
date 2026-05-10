@@ -31,7 +31,7 @@ COPY ./nginx/trumpet.conf /etc/nginx/http.d/default.conf
 # Copy application code
 COPY ./Backend /var/www/trumpet/Backend
 COPY ./python_services /var/www/trumpet/python_services
-COPY ./resources /var/www/trumpet/resources
+RUN mkdir -p /var/www/trumpet/resources
 COPY ./Frontend /var/www/trumpet/Frontend
 
 # Install Backend dependencies
