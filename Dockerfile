@@ -1,7 +1,7 @@
-# Unified Dockerfile: Nginx + PHP 8.3 + Python
+# Unified Dockerfile: Nginx + PHP 8.3 + Python + MySQL (bundled, no external DB needed)
 FROM php:8.3-fpm-alpine
 
-# Install system dependencies
+# Install system dependencies (including MySQL server)
 RUN apk add --no-cache \
     nginx \
     supervisor \
@@ -14,7 +14,9 @@ RUN apk add --no-cache \
     python3 \
     py3-pip \
     libzip-dev \
-    oniguruma-dev
+    oniguruma-dev \
+    mysql \
+    mysql-client
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
@@ -34,6 +36,10 @@ COPY ./python_services /var/www/trumpet/python_services
 RUN mkdir -p /var/www/trumpet/resources
 COPY ./Frontend /var/www/trumpet/Frontend
 
+# Copy database files (schema + dump for first-boot import)
+COPY ./database/schema.sql /var/www/trumpet/database/schema.sql
+COPY ./database/dump.sql   /var/www/trumpet/database/dump.sql
+
 # Install Backend dependencies
 WORKDIR /var/www/trumpet/Backend
 RUN composer install --no-interaction --no-plugins --no-scripts
@@ -42,17 +48,22 @@ RUN composer install --no-interaction --no-plugins --no-scripts
 WORKDIR /var/www/trumpet/Frontend
 RUN apk add --no-cache nodejs npm
 RUN npm install && npm run build
-RUN cp -r dist/* /usr/share/nginx/html/
+RUN mkdir -p /usr/share/nginx/html && cp -r dist/* /usr/share/nginx/html/
 
 # Setup Python environment
 WORKDIR /var/www/trumpet/python_services
 RUN python3 -m venv venv
 RUN ./venv/bin/pip install -r requirements.txt
 
-# Setup Supervisor to run both Nginx and PHP-FPM
+# Setup Supervisor to run Nginx, PHP-FPM, and MySQL
 COPY ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Copy and make entrypoint executable
+COPY ./scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 WORKDIR /var/www/trumpet
 
 EXPOSE 80
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Entrypoint handles first-boot MySQL init, then starts supervisord
+CMD ["/usr/local/bin/docker-entrypoint.sh"]

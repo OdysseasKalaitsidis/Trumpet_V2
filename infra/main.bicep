@@ -24,7 +24,7 @@ param apiKey string
 var prefix = 'trumpet-${environment}'
 var acrName = 'trumpetacr${environment}' // ACR names: alphanumeric only, globally unique
 var mysqlServerName = '${prefix}-mysql'
-var storageAccountName = 'trumpetstorage${environment}' // max 24 chars, lowercase
+// Storage: not used — media is served from the container's local /resources path
 
 // ── Azure Container Registry ──────────────────────────────────────────────────
 resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
@@ -38,32 +38,6 @@ resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
   }
 }
 
-// ── Azure Storage Account (for media files) ───────────────────────────────────
-resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
-  name: storageAccountName
-  location: location
-  sku: {
-    name: 'Standard_LRS'
-  }
-  kind: 'StorageV2'
-  properties: {
-    allowBlobPublicAccess: true
-    minimumTlsVersion: 'TLS1_2'
-  }
-}
-
-resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-01-01' = {
-  parent: storageAccount
-  name: 'default'
-}
-
-resource mediaContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01' = {
-  parent: blobService
-  name: 'media'
-  properties: {
-    publicAccess: 'Blob'
-  }
-}
 
 // ── Azure Database for MySQL Flexible Server ──────────────────────────────────
 resource mysqlServer 'Microsoft.DBforMySQL/flexibleServers@2023-06-30' = {
@@ -140,13 +114,7 @@ resource kvSecretApiKey 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   }
 }
 
-resource kvSecretStorageConn 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
-  parent: keyVault
-  name: 'storage-connection-string'
-  properties: {
-    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
-  }
-}
+// Storage connection string secret: removed (no blob storage)
 
 // ── Container Apps Environment ────────────────────────────────────────────────
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
@@ -218,7 +186,6 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
             { name: 'DB_NAME', value: 'trumpet' }
             { name: 'DB_USER', value: mysqlAdminUser }
             { name: 'DB_PASS', secretRef: 'acr-password' } // will be replaced with KV ref after deploy
-            { name: 'AZURE_CONTAINER_NAME', value: 'media' }
             { name: 'PYTHON_BIN', value: '/var/www/trumpet/python_services/venv/bin/python3' }
             { name: 'PYTHON_SERVICES_PATH', value: '/var/www/trumpet/python_services' }
           ]
@@ -246,5 +213,5 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
 output acrLoginServer string = acr.properties.loginServer
 output containerAppUrl string = 'https://${containerApp.properties.configuration.ingress.fqdn}'
 output mysqlHost string = mysqlServer.properties.fullyQualifiedDomainName
-output storageAccountName string = storageAccount.name
+// output storageAccountName: removed (no blob storage)
 output keyVaultName string = keyVault.name
