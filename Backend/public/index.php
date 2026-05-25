@@ -97,7 +97,7 @@ $app->get('/api/collections/{id}',          [$collections, 'getCollection']);
 $app->get('/api/CommunityItems/{community_id}', [$communityItems, 'getByCommId']);
 
 // ── 10. Routes — Media manifest (MUST be before wildcard route) ─────────────
-$app->get('/api/media/manifest.json', function ($req, $res) use ($settings) {
+$app->get('/media/manifest.json', function ($req, $res) use ($settings) {
     $resourcesPath = $settings['resources_path'] ?? '/var/www/trumpet/resources';
     $files = [];
     if (is_dir($resourcesPath)) {

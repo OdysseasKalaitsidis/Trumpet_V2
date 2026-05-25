@@ -44,7 +44,7 @@ properties:
         value: /var/www/trumpet/python_services/venv/bin/python3
       - name: PYTHON_SERVICES_PATH
         value: /var/www/trumpet/python_services
-      image: trumpetacrprod.azurecr.io/trumpet:latest
+      image: trumpetacrprod.azurecr.io/trumpet@sha256:df832895767333c072d91649433902aef8bec1a6b8b4083bebead62666cd9eff
       name: trumpet-prod-web
       resources:
         cpu: 1.0
