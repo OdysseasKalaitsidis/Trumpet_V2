@@ -1,0 +1,13 @@
+.git
+.github
+.dist
+node_modules
+**/node_modules
+Frontend/node_modules
+Frontend/dist
+python_services/venv
+python_services/__pycache__
+Backend/vendor
+resources
+database/data
+tmp

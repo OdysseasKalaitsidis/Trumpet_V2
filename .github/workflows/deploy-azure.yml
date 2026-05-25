@@ -2,6 +2,7 @@
 # Trumpet — GitHub Actions CI/CD Pipeline
 # Trigger: push to main branch
 # Flow:    Build Docker image → Push to ACR → Deploy to Azure Container Apps
+# Auth:    ACR admin creds for Docker push; Azure CLI via OIDC for deployment
 # ─────────────────────────────────────────────────────────────────────────────
 
 name: 🚀 Build & Deploy to Azure
@@ -11,11 +12,17 @@ on:
     branches: [main]   # Auto-deploy on every push to main
   workflow_dispatch:   # Also allow manual trigger from GitHub UI
 
+permissions:
+  id-token: write   # Required for OIDC login
+  contents: read
+
 env:
+  ACR_LOGIN_SERVER: trumpetacrprod.azurecr.io
   ACR_NAME: trumpetacrprod
   CONTAINER_APP_NAME: trumpet-prod-web
   RESOURCE_GROUP: trumpet-prod-rg
   IMAGE_NAME: trumpet
+  SUBSCRIPTION_ID: 5479d563-6336-4631-ace1-ec4af5b6d779
 
 jobs:
   # ── Job 1: Build & Push Docker image to ACR ──────────────────────────────────
@@ -30,13 +37,12 @@ jobs:
       - name: ⬇️ Checkout source code
         uses: actions/checkout@v4
 
-      - name: 🔑 Log in to Azure
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
       - name: 🔑 Log in to Azure Container Registry
-        run: az acr login --name ${{ env.ACR_NAME }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
 
       - name: 🏷️ Generate image metadata (tag = git SHA short)
         id: meta
@@ -48,35 +54,36 @@ jobs:
       - name: 🔨 Build Docker image
         run: |
           docker build \
-            --tag ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }} \
-            --tag ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest \
+            --tag ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }} \
+            --tag ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest \
             --file Dockerfile \
             .
 
       - name: 📤 Push image to ACR
         run: |
-          docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
-          docker push ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
+          docker push ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:latest
 
   # ── Job 2: Deploy new image to Azure Container Apps ──────────────────────────
   deploy:
     name: 🚀 Deploy to Azure Container Apps
     runs-on: ubuntu-latest
     needs: build-and-push
-    environment: production     # GitHub environment with approval gate (optional)
 
     steps:
-      - name: 🔑 Log in to Azure
+      - name: 🔑 Log in to Azure (OIDC)
         uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ env.SUBSCRIPTION_ID }}
 
       - name: 🚀 Deploy new Container App revision
         run: |
           az containerapp update \
             --name ${{ env.CONTAINER_APP_NAME }} \
             --resource-group ${{ env.RESOURCE_GROUP }} \
-            --image ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ needs.build-and-push.outputs.image-tag }}
+            --image ${{ env.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ needs.build-and-push.outputs.image-tag }}
 
       - name: 🌐 Get live URL
         id: get-url
@@ -92,16 +99,16 @@ jobs:
       - name: 🩺 Smoke test (verify app responds)
         run: |
           echo "Running smoke test against ${{ steps.get-url.outputs.url }}"
-          for i in {1..5}; do
+          for i in {1..8}; do
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.get-url.outputs.url }})
             if [ "$STATUS" = "200" ]; then
               echo "✅ Smoke test passed — HTTP $STATUS"
               exit 0
             fi
-            echo "⏳ Attempt $i: HTTP $STATUS — waiting 15s..."
-            sleep 15
+            echo "⏳ Attempt $i: HTTP $STATUS — waiting 20s..."
+            sleep 20
           done
-          echo "❌ Smoke test failed after 5 attempts"
+          echo "❌ Smoke test failed after 8 attempts"
           exit 1
 
       - name: 📋 Print deployment summary

@@ -18,6 +18,9 @@ RUN apk add --no-cache \
     mysql \
     mysql-client
 
+# Disable skip-networking in default MariaDB configuration to allow TCP loopback connections
+RUN sed -i 's/skip-networking/#skip-networking/g' /etc/my.cnf.d/*.cnf
+
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 

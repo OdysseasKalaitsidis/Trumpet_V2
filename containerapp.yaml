@@ -1,0 +1,62 @@
+id: /subscriptions/5479d563-6336-4631-ace1-ec4af5b6d779/resourceGroups/trumpet-prod-rg/providers/Microsoft.App/containerapps/trumpet-prod-web
+identity:
+  type: None
+location: North Europe
+name: trumpet-prod-web
+properties:
+  configuration:
+    activeRevisionsMode: Single
+    ingress:
+      allowInsecure: false
+      external: true
+      targetPort: 80
+      transport: Auto
+      traffic:
+      - latestRevision: true
+        weight: 100
+    registries:
+    - identity: ''
+      passwordSecretRef: trumpetacrprodazurecrio-trumpetacrprod
+      server: trumpetacrprod.azurecr.io
+      username: trumpetacrprod
+    secrets:
+    - name: trumpetacrprodazurecrio-trumpetacrprod
+      value: DOB7muOJk4b8TYoBeFik3RlrRSwzxTGHlghVS7DqoehP2Q4Sxi7gJQQJ99CEACi5YpzEqg7NAAACAZCRB4JK
+  environmentId: /subscriptions/5479d563-6336-4631-ace1-ec4af5b6d779/resourceGroups/trumpet-prod-rg/providers/Microsoft.App/managedEnvironments/trumpet-prod-env
+  template:
+    containers:
+    - env:
+      - name: DB_HOST
+        value: 127.0.0.1
+      - name: DB_PORT
+        value: '3306'
+      - name: DB_NAME
+        value: trumpet
+      - name: DB_USER
+        value: trumpetadmin
+      - name: DB_PASS
+        value: password
+      - name: API_KEY
+        value: trumpet_dev_key
+      - name: RESOURCES_PATH
+        value: /var/www/trumpet/resources
+      - name: PYTHON_BIN
+        value: /var/www/trumpet/python_services/venv/bin/python3
+      - name: PYTHON_SERVICES_PATH
+        value: /var/www/trumpet/python_services
+      image: trumpetacrprod.azurecr.io/trumpet:latest
+      name: trumpet-prod-web
+      resources:
+        cpu: 1.0
+        ephemeralStorage: 4Gi
+        memory: 2Gi
+      volumeMounts:
+      - mountPath: /var/lib/mysql
+        volumeName: mysql-volume
+    scale:
+      maxReplicas: 1
+      minReplicas: 1
+    volumes:
+    - name: mysql-volume
+      storageName: mysql-volume
+      storageType: AzureFile

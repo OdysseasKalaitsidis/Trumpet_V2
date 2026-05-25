@@ -15,13 +15,17 @@ DB_PASS="${DB_PASS:-changeme}"
 
 echo "==> [Entrypoint] Starting Trumpet container..."
 
+# Ensure correct ownership and directory creation for MariaDB socket on every boot
+mkdir -p /run/mysqld
+chown -R mysql:mysql /run/mysqld
+
 # ── Step 1: Initialise MySQL data directory if it doesn't exist ────────────
 if [ ! -f "$INIT_MARKER" ]; then
     echo "==> [Entrypoint] First boot — initialising MySQL..."
 
-    # Ensure correct ownership and directory creation for MariaDB
-    mkdir -p /run/mysqld "$MYSQL_DATA_DIR"
-    chown -R mysql:mysql /run/mysqld "$MYSQL_DATA_DIR"
+    # Ensure correct ownership and directory creation for MariaDB data
+    mkdir -p "$MYSQL_DATA_DIR"
+    chown -R mysql:mysql "$MYSQL_DATA_DIR"
 
     # Initialise the data directory using MariaDB installer
     mariadb-install-db --user=mysql --datadir="$MYSQL_DATA_DIR"
