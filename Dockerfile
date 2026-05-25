@@ -47,10 +47,11 @@ COPY ./database/dump.sql   /var/www/trumpet/database/dump.sql
 WORKDIR /var/www/trumpet/Backend
 RUN composer install --no-interaction --no-plugins --no-scripts
 
-# Build Frontend
+# Build Frontend (VITE_API_BASE_URL="" so /api/items etc. use relative paths — same origin)
 WORKDIR /var/www/trumpet/Frontend
 RUN apk add --no-cache nodejs npm
-RUN npm install && npm run build
+RUN npm install
+RUN VITE_API_BASE_URL="" npm run build
 RUN mkdir -p /usr/share/nginx/html && cp -r dist/* /usr/share/nginx/html/
 
 # Setup Python environment
