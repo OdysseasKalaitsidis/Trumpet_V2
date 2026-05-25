@@ -96,8 +96,30 @@ $app->get('/api/collections/{id}',          [$collections, 'getCollection']);
 // ── 9. Routes — Community Items ──────────────────────────────────────────────
 $app->get('/api/CommunityItems/{community_id}', [$communityItems, 'getByCommId']);
 
-// ── 10. Routes — Media ──────────────────────────────────────────────────────
+// ── 10. Routes — Media manifest (MUST be before wildcard route) ─────────────
+$app->get('/api/media/manifest.json', function ($req, $res) use ($settings) {
+    $resourcesPath = $settings['resources_path'] ?? '/var/www/trumpet/resources';
+    $files = [];
+    if (is_dir($resourcesPath)) {
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($resourcesPath, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+        foreach ($iterator as $file) {
+            if ($file->isFile()) {
+                $relativePath = str_replace($resourcesPath . DIRECTORY_SEPARATOR, '', $file->getPathname());
+                $files[] = str_replace('\\', '/', $relativePath);
+            }
+        }
+    }
+    $payload = json_encode($files);
+    $res->getBody()->write($payload);
+    return $res->withHeader('Content-Type', 'application/json');
+});
+
+// ── 11. Routes — Media files ─────────────────────────────────────────────────
 $app->get('/api/media/{path:.+}',           [$media, 'redirect']);
+
 
 // ── 12. OPTIONS Preflight handler ────────────────────────────────────────────
 $app->options('/{routes:.+}', function ($request, $response) {
