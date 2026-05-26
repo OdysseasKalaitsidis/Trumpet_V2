@@ -13,7 +13,7 @@ use Dotenv\Dotenv;
 // Load .env if not already loaded (idempotent)
 if (!isset($_ENV['DB_HOST'])) {
     $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-    $dotenv->load();
+    $dotenv->safeLoad();
 }
 
 static $pdo = null;

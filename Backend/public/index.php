@@ -38,7 +38,7 @@ use Trumpet\Controllers\MediaController;
 
 // ── 1. Load environment ──────────────────────────────────────────────────────
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
-$dotenv->load();
+$dotenv->safeLoad();
 
 // ── 2. Bootstrap PDO & settings ──────────────────────────────────────────────
 $pdo      = require __DIR__ . '/../config/database.php';
